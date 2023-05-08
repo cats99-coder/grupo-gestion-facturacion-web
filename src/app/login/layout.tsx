@@ -1,7 +1,3 @@
-import Providers from "@/components/Providers";
-import "./globals.css";
-import React from "react";
-
 export const metadata = {
   title: "Grupo Gestión. Facturación",
   description: "Facturación",
@@ -13,10 +9,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
-      <Providers>
-        {children}
-      </Providers>
-    </html>
+    <body className="flex justify-center items-center h-screen">
+      {children}
+    </body>
   );
 }

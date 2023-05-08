@@ -1,6 +1,4 @@
-import Providers from "@/components/Providers";
-import "./globals.css";
-import React from "react";
+import Header from "@/components/Header";
 
 export const metadata = {
   title: "Grupo Gestión. Facturación",
@@ -13,10 +11,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
-      <Providers>
-        {children}
-      </Providers>
-    </html>
+    <body className="h-screen grid grid-rows-[min-content_minmax(0,1fr)] overflow-hidden">
+      <Header />
+      <main className="p-3">{children}</main>
+    </body>
   );
 }
