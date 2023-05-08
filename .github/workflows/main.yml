@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: facturacion-web
     strategy:
       matrix:
         node-version: [18.x]
