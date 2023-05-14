@@ -1,5 +1,5 @@
 export class Service {
-  URL = process.env.URL;
+  URL = process.env.NEXT_PUBLIC_URL;
   async get(url: string) {
     return await fetch(this.URL + url);
   }
@@ -7,6 +7,7 @@ export class Service {
     return await fetch(this.URL + url, {
       method: "POST",
       headers: {
+        authorization: localStorage.getItem("token") || "",
         "content-type": "application/json",
       },
       body: JSON.stringify(body),

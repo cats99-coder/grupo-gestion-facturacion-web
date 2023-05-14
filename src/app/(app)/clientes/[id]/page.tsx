@@ -12,6 +12,7 @@ import { ClientesService } from "@/services/clientes.service";
 import Facturas from "@/components/ClientesTabPanel/Facturas";
 import { AuthContext } from "@/components/Providers";
 import { useContext } from "react";
+import Documentos from "@/components/ClientesTabPanel/Documentos";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -113,6 +114,7 @@ export default function BasicTabs() {
   return (
     <section className="h-full grid grid-rows-[min-content_min-content_minmax(0,1fr)] gap-y-2">
       <div className="flex justify-end items-center">
+        <Documentos _id={cliente._id} />
         <Button onClick={saveClient}>
           {id !== "nuevo" ? "Guardar" : "Crear"}
         </Button>

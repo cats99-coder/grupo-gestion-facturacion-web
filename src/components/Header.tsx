@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ReactNode } from "react";
+import Perfil from "./Perfil";
 
 function NavLink({ href, children }: { href: string; children: ReactNode }) {
   return (
@@ -21,11 +22,12 @@ export default function Header() {
       </div>
       <nav className="flex">
         <ul>
+          <NavLink href={"/usuarios"}>Usuarios</NavLink>
           <NavLink href={"/clientes"}>Clientes</NavLink>
           <NavLink href={"/expedientes"}>Expedientes</NavLink>
           <NavLink href={"/facturas"}>Facturas</NavLink>
-          <NavLink href={"/facturas"}>Servicios</NavLink>
         </ul>
+        <Perfil />
       </nav>
     </header>
   );

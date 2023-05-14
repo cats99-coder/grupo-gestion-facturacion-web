@@ -14,6 +14,7 @@ export default function Facturas() {
   const [facturas, setFacturas] = useState<GridRowsProp>([]);
   useEffect(() => {
     new FacturasService().getAll().then(async (response) => {
+      console.log(response.ok)
       setFacturas(await response.json());
     });
   }, []);
@@ -27,7 +28,6 @@ export default function Facturas() {
         return res;
       })
       .then((blob) => {
-        console.log(blob.name);
         const objectURL = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = objectURL;

@@ -64,7 +64,7 @@ export default function Facturas({ _id }: { _id: string }) {
     },
   ];
   return (
-    <div style={{ height: 300, width: "100%", overflowX: "auto" }}>
+    <div className="w-full grid grid-rows-[minmax(0,1fr)] overflow-hidden h-full gap-y-2">
       <DataGrid
         sortModel={[{ field: "numero_factura", sort: "desc" }]}
         checkboxSelection={true}

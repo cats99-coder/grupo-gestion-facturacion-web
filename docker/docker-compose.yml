@@ -1,0 +1,10 @@
+version: '3'
+services:
+  facturacion-web:
+    build: 
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    restart: always
+    user: node
+    ports:
+      - 3001:3000

@@ -7,6 +7,7 @@ import { Autocomplete, Button } from "@mui/material";
 import { ClientesService } from "@/services/clientes.service";
 import { DatePicker } from "@mui/x-date-pickers";
 import { ToastContext } from "@/components/Providers";
+import { DateTime } from "luxon";
 
 export default function Expediente() {
   interface Expediente {
@@ -46,7 +47,7 @@ export default function Expediente() {
     _id: "",
     numero_expediente: "",
     cliente: null,
-    fecha: new Date(),
+    fecha: new Date(Date.now()),
     usuario: null,
     concepto: "",
     tipo: "FISCAL",
@@ -61,11 +62,18 @@ export default function Expediente() {
       serie: 0,
     },
   });
+  const [fecha, setFecha] = React.useState<DateTime | null>(
+    DateTime.fromJSDate(new Date(Date.now()))
+  );
   const { id } = useParams();
   React.useEffect(() => {
     if (id !== "nuevo") {
       new ExpedientesService().getById(id).then(async (response) => {
         const res: Expediente = await response.json();
+        if (res.fecha) {
+          res.fecha = new Date(res.fecha);
+          setFecha(DateTime.fromJSDate(res.fecha));
+        }
         setExpediente({ ...expediente, ...res });
         if (res.factura && res.factura.numero_factura !== 0) {
           setFacturado(true);
@@ -80,7 +88,8 @@ export default function Expediente() {
   const handleExpediente = (e: React.ChangeEvent<HTMLInputElement>) => {
     setExpediente({ ...expediente, [e.target.name]: e.target.value });
   };
-  const { setOpenSuccess, setMessageSuccess } = React.useContext<any>(ToastContext);
+  const { setOpenSuccess, setMessageSuccess } =
+    React.useContext<any>(ToastContext);
   const handleExpedienteCliente = (e: any, value: Cliente) => {
     setExpediente({ ...expediente, cliente: value });
   };
@@ -95,12 +104,14 @@ export default function Expediente() {
   };
   const saveExpediente = () => {
     if (id !== "nuevo") {
-      const { factura, ...updateExpediente } = expediente;
-      new ExpedientesService().update(id, updateExpediente).then((response) => {
-        if (!response.ok) return false;
-        setOpenSuccess(true);
-        setMessageSuccess("Actualizado con exito");
-      });
+      const { factura, fecha: f, ...updateExpediente } = expediente;
+      new ExpedientesService()
+        .update(id, { ...updateExpediente, fecha: fecha?.toString() })
+        .then((response) => {
+          if (!response.ok) return false;
+          setOpenSuccess(true);
+          setMessageSuccess("Actualizado con exito");
+        });
     } else {
       const { _id, numero_expediente, factura, ...createExpediente } =
         expediente;
@@ -154,6 +165,9 @@ export default function Expediente() {
           slotProps={{ textField: { size: "small" } }}
           format="dd/MM/yyyy"
           sx={{ height: "100%" }}
+          value={fecha}
+          disabled={facturado}
+          onChange={(newValue) => setFecha(newValue)}
         />
         <Autocomplete
           options={clientes}

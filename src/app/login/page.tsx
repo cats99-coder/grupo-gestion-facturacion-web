@@ -1,15 +1,13 @@
 "use client";
 import { Button, TextField } from "@mui/material";
 import Image from "next/image";
-import { useState, useContext } from "react";
-import { AuthContext } from "@/components/Providers";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import * as Jose from "jose";
+import Cookies from "js-cookie";
 
 export default function Login() {
   const [usuario, setUsuario] = useState("");
   const [password, setPassword] = useState("");
-  const { setUser } = useContext<any>(AuthContext);
   const router = useRouter();
   const handleLogin = () => {
     fetch("http://localhost:3001/auth/login", {
@@ -25,16 +23,10 @@ export default function Login() {
       .then(async (response) => {
         if (!response.ok) throw new Error("Error login");
         const res = await response.json();
-        localStorage.setItem(
-          "token",
-          JSON.stringify(Jose.decodeJwt(res.access_token))
-        );
-        setUser(Jose.decodeJwt(res.access_token));
-        router.replace(
-          "http://localhost:3000/clientes/6453cbeab93ecb717444ab70"
-        );
+        Cookies.set("token", res.access_token);
+        router.replace("http://localhost:3000/");
       })
-      .catch((err) => {});
+      .catch((err) => {});  
   };
   return (
     <div className="shadow-md rounded-md px-3 py-2 space-y-3 flex flex-col">

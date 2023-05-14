@@ -2,7 +2,6 @@
 import { esES } from "@mui/x-data-grid";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
-import { useParams, useRouter } from "next/navigation";
 import { ReactNode, useState, Suspense, createContext } from "react";
 import {
   Alert,
@@ -11,13 +10,18 @@ import {
   createTheme,
   ThemeProvider,
 } from "@mui/material";
+import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
 export const ToastContext = createContext({});
 export const AuthContext = createContext({});
 
-export default function Providers({ children }: { children: ReactNode }) {
-  const router = useRouter();
-  const params = useParams();
+export default function Providers({
+  children,
+  token,
+}: {
+  children: ReactNode;
+  token: RequestCookie | undefined;
+}) {
   const theme = createTheme(
     {
       palette: {
@@ -31,9 +35,8 @@ export default function Providers({ children }: { children: ReactNode }) {
   const [openSuccess, setOpenSuccess] = useState(false);
   const [messageSuccess, setMessageSuccess] = useState("");
   const [user, setUser] = useState(() => {
-    const token = localStorage.getItem("token");
-    if (token !== null) {
-      return JSON.parse(token);
+    if (token) {
+      return token;
     } else {
       return {};
     }

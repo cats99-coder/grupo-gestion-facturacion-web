@@ -5,15 +5,15 @@ import {
   GridColDef,
   GridEventListener,
 } from "@mui/x-data-grid";
-import { DateField } from "@mui/x-date-pickers";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@mui/material";
+import { ExpedientesService } from "@/services/expedientes.service";
 
 export default function Clientes() {
   const [clientes, setClientes] = useState<GridRowsProp>([]);
   useEffect(() => {
-    fetch("http://localhost:3001/expedientes").then(async (response) => {
+    new ExpedientesService().getAll().then(async (response) => {
       setClientes(await response.json());
     });
   }, []);
@@ -29,9 +29,9 @@ export default function Clientes() {
     },
     {
       field: "fecha",
-      type: 'date',
-      valueGetter: (params)=> {
-        return new Date(params.row?.fecha)
+      type: "date",
+      valueGetter: (params) => {
+        return new Date(params.row?.fecha);
       },
       headerName: "Fecha",
       width: 150,

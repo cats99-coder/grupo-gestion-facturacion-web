@@ -1,10 +1,8 @@
-import Image from 'next/image'
-
+"use client";
+import { AuthContext } from "@/components/Providers";
+import { useContext } from "react";
 
 export default function Home() {
-  return (
-    <main>
-
-    </main>
-  )
+  const { user } = useContext<any>(AuthContext);
+  return <main>{user && user.nombre}</main>;
 }
