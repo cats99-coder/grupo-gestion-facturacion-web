@@ -3,8 +3,8 @@ const nextConfig = () => {
   const rewrites = () => {
     return [
       {
-        source: "/api",
-        destination: "http://localhost:3001",
+        source: "/api/:path*",
+        destination: "http://localhost:3001/:path*",
       },
     ];
   };
