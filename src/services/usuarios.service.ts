@@ -11,6 +11,9 @@ export class UsuariosService extends Service {
   async getAll() {
     return await this.get("/usuarios");
   }
+  async getById(id: string) {
+    return await this.get(`/usuarios/${id}`);
+  }
   async create(cliente: Usuario) {
     return await this.post("/usuarios", cliente);
   }

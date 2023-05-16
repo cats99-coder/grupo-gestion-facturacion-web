@@ -85,7 +85,7 @@ export default function BasicTabs() {
   const { id } = useParams();
   React.useEffect(() => {
     if (id !== "nuevo") {
-      fetch(`http://localhost:3001/clientes/${id}`).then(async (response) => {
+      new ClientesService().getById(id).then(async (response) => {
         const res: Cliente = await response.json();
         setCliente(res);
         setContactos(res.contactos);

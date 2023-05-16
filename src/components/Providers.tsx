@@ -20,7 +20,7 @@ export default function Providers({
   token,
 }: {
   children: ReactNode;
-  token: RequestCookie | undefined;
+  token: {} | undefined;
 }) {
   const theme = createTheme(
     {

@@ -8,11 +8,12 @@ import {
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@mui/material";
+import { ClientesService } from "@/services/clientes.service";
 
 export default function Clientes() {
   const [clientes, setClientes] = useState<GridRowsProp>([]);
   useEffect(() => {
-    fetch("http://localhost:3001/clientes").then(async (response) => {
+    new ClientesService().getAll().then(async (response) => {
       setClientes(await response.json());
     });
   }, []);

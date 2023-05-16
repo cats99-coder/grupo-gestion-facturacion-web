@@ -11,6 +11,9 @@ export class ClientesService extends Service {
   async getAll() {
     return await this.get("/clientes");
   }
+  async getById(id: string) {
+    return await this.get(`/clientes/${id}`);
+  }
   async getExpedients(_id: string) {
     return await this.post("/expedientes/porCliente", { cliente: _id });
   }

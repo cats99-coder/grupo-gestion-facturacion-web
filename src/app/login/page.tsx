@@ -10,7 +10,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const router = useRouter();
   const handleLogin = () => {
-    fetch("http://localhost:3001/auth/login", {
+    fetch(`${process.env.NEXT_PUBLIC_URL}/auth/login`, {
       method: "POST",
       body: JSON.stringify({
         usuario,
@@ -24,7 +24,7 @@ export default function Login() {
         if (!response.ok) throw new Error("Error login");
         const res = await response.json();
         Cookies.set("token", res.access_token);
-        router.replace("http://localhost:3000/");
+        router.replace("/");
       })
       .catch((err) => {});  
   };

@@ -1,4 +1,3 @@
-import Providers from "@/components/Providers";
 import "./globals.css";
 import React from "react";
 

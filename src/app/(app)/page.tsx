@@ -4,5 +4,5 @@ import { useContext } from "react";
 
 export default function Home() {
   const { user } = useContext<any>(AuthContext);
-  return <main>{user && user.nombre}</main>;
+  return <main></main>;
 }

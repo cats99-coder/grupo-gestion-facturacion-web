@@ -15,7 +15,6 @@ export default function RootLayout({
 }) {
   const token = cookies().get("token")?.value || "";
   const tokenDecoded = Jose.decodeJwt(token);
-  console.log(tokenDecoded);
   return (
     <Providers token={tokenDecoded}>
       <body className="h-screen grid grid-rows-[min-content_minmax(0,1fr)] overflow-hidden">
