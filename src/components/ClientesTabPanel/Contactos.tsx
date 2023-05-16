@@ -9,9 +9,8 @@ import CancelIcon from "@mui/icons-material/Close";
 import {
   GridRowsProp,
   GridRowModesModel,
-  GridRowModes,
+  GridRowModes, 
   DataGrid,
-  GridColDef,
   GridRowParams,
   MuiEvent,
   GridToolbarContainer,
@@ -116,6 +115,8 @@ export default function Suplidos({ initialRows, handleContactos }) {
     { field: "nombre", headerName: "Nombre", width: 150, editable: true },
     { field: "apellido1", headerName: "Primer Apellido", width: 150, editable: true },
     { field: "apellido2", headerName: "Segundo Apellido", width: 150, editable: true },
+    { field: "telefono", headerName: "Teléfono", width: 150, editable: true },
+    { field: "email", headerName: "Email", width: 150, editable: true },
     {
       field: "actions",
       type: "actions",

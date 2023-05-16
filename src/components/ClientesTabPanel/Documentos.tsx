@@ -7,7 +7,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
-import { FiscalService } from "@/services/fiscal.service";
+import RubenContratoAutonomo from "./Documents/Ruben/contrato-autonomo";
 
 export default function Documentos({ _id }: { _id: string }) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -19,28 +19,15 @@ export default function Documentos({ _id }: { _id: string }) {
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
-  const blobProcess = (blob: Blob) => {
-    const objectURL = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = objectURL;
-    a.title = 'invoice.pdf'
-    a.target = "_blank";
-    a.click();
+  const [openContratoAutonomo, setOpenContratoAutonomo] = React.useState(false);
+  const handleClickOpenContratoAutonomo = () => {
+    setOpenContratoAutonomo(true);
   };
-  const handleContratoAutonomo = () => {
-    new FiscalService()
-      .imprimir({ _id })
-      .then(async (response) => {
-        if (!response.ok) throw new Error();
-        const res = await response.blob();
-        return res;
-      })
-      .then((blob) => blobProcess(blob))
-      .catch((err) => {
-        console.log(err);
-      });
-    handleClose();
+  const handleCloseContratoAutonomo = () => {
+    setOpenContratoAutonomo(false);
+    handleClose()
   };
+
   return (
     <div>
       <Button
@@ -61,8 +48,16 @@ export default function Documentos({ _id }: { _id: string }) {
           "aria-labelledby": "basic-button",
         }}
       >
-        <MenuItem onClick={handleContratoAutonomo}>Contrato Autónomo</MenuItem>
+        <MenuItem onClick={handleClickOpenContratoAutonomo}>
+          Contrato Autónomo
+        </MenuItem>
       </Menu>
+      {/* Rubén Contrato Autónomo */}
+      <RubenContratoAutonomo
+        _id={_id}
+        open={openContratoAutonomo}
+        handleClose={handleCloseContratoAutonomo}
+      />
     </div>
   );
 }
