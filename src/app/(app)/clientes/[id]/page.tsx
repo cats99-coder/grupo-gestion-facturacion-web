@@ -13,6 +13,8 @@ import Facturas from "@/components/ClientesTabPanel/Facturas";
 import { AuthContext } from "@/components/Providers";
 import { useContext } from "react";
 import Documentos from "@/components/ClientesTabPanel/Documentos";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -49,8 +51,13 @@ export default function BasicTabs() {
   interface Cliente {
     _id: string;
     NIF: string;
-    nombre: string;
+    tipo: "EMPRESA" | "PERSONA";
+    razon_social?: string;
+    nombre?: string;
+    apellido1?: string;
+    apellido2?: string;
     numero_cuenta: string;
+    telefono: string;
     email: string;
     codigo_postal: string;
     localidad: string;
@@ -71,36 +78,51 @@ export default function BasicTabs() {
   const [cliente, setCliente] = React.useState<Cliente>({
     _id: "",
     NIF: "",
+    razon_social: "",
     nombre: "",
+    apellido1: "",
+    tipo: "PERSONA",
+    apellido2: "",
     numero_cuenta: "",
     email: "",
     codigo_postal: "",
     localidad: "",
+    telefono: "",
     provincia: "",
     pais: "",
     retencion: false,
     contactos: [],
   });
-  const [contactos, setContactos] = React.useState<Contacto[]>([]);
   const { id } = useParams();
   React.useEffect(() => {
     if (id !== "nuevo") {
       new ClientesService().getById(id).then(async (response) => {
         const res: Cliente = await response.json();
         setCliente(res);
-        setContactos(res.contactos);
       });
     }
   }, []);
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
   };
-  const handleCliente = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleContactos = (contactos) => {
+    setCliente({ ...cliente, contactos });
+  };
+  const handleCliente = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    name?: string
+  ) => {
     if (e.target.name === "retencion") {
       setCliente({ ...cliente, [e.target.name]: e.target.checked });
     } else {
       setCliente({ ...cliente, [e.target.name]: e.target.value });
     }
+  };
+  const handleTipo = (
+    event: React.MouseEvent<HTMLElement>,
+    newAlignment: string | null
+  ) => {
+    setCliente({ ...cliente, tipo: newAlignment });
   };
   const saveClient = () => {
     if (id !== "nuevo") {
@@ -114,6 +136,32 @@ export default function BasicTabs() {
   return (
     <section className="h-full grid grid-rows-[min-content_min-content_minmax(0,1fr)] gap-y-2">
       <div className="flex justify-end items-center">
+        <div>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={cliente.retencion}
+                name="retencion"
+                onChange={handleCliente}
+                inputProps={{ "aria-label": "controlled" }}
+              />
+            }
+            label="Retención"
+          />
+          <ToggleButtonGroup
+            value={cliente.tipo}
+            exclusive
+            onChange={handleTipo}
+            aria-label="text alignment"
+          >
+            <ToggleButton value="EMPRESA" aria-label="empresa">
+              EMPRESA
+            </ToggleButton>
+            <ToggleButton value="PERSONA" aria-label="persona">
+              PERSONA
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </div>
         <Documentos _id={cliente._id} />
         <Button onClick={saveClient}>
           {id !== "nuevo" ? "Guardar" : "Crear"}
@@ -132,17 +180,56 @@ export default function BasicTabs() {
           variant="outlined"
           autoComplete="off"
         />
-        <TextField
-          className="col-span-3"
-          size="small"
-          onChange={handleCliente}
-          name="nombre"
-          value={cliente.nombre}
-          id="NIF"
-          label="Nombre"
-          variant="outlined"
-          autoComplete="off"
-        />
+        {cliente.tipo === "EMPRESA" && (
+          <TextField
+            className="col-span-3"
+            size="small"
+            onChange={handleCliente}
+            name="razon_social"
+            value={cliente.razon_social}
+            id="razon_social"
+            label="Razón Social"
+            variant="outlined"
+            autoComplete="off"
+          />
+        )}
+        {cliente.tipo === "PERSONA" && (
+          <>
+            <TextField
+              className="col-span-1"
+              size="small"
+              onChange={handleCliente}
+              name="nombre"
+              value={cliente.nombre}
+              id="NIF"
+              label="Nombre"
+              variant="outlined"
+              autoComplete="off"
+            />
+            <TextField
+              className="col-span-1"
+              size="small"
+              onChange={handleCliente}
+              name="apellido1"
+              value={cliente.apellido1}
+              id="apellido1"
+              label="Primer Apellido"
+              variant="outlined"
+              autoComplete="off"
+            />
+            <TextField
+              className="col-span-1"
+              size="small"
+              onChange={handleCliente}
+              name="apellido2"
+              value={cliente.apellido2}
+              id="apellido2"
+              label="Segundo Apellido"
+              variant="outlined"
+              autoComplete="off"
+            />
+          </>
+        )}
         <TextField
           className="col-span-2"
           type="email"
@@ -156,13 +243,24 @@ export default function BasicTabs() {
           autoComplete="off"
         />
         <TextField
-          className="col-span-2"
+          className="col-span-1"
           size="small"
           onChange={handleCliente}
           name="numero_cuenta"
           value={cliente.numero_cuenta}
           id="numero_cuenta"
           label="Número Cuenta"
+          variant="outlined"
+          autoComplete="off"
+        />
+        <TextField
+          className="col-span-1"
+          size="small"
+          onChange={handleCliente}
+          name="telefono"
+          value={cliente.telefono}
+          id="telefono"
+          label="Teléfono"
           variant="outlined"
           autoComplete="off"
         />
@@ -210,17 +308,6 @@ export default function BasicTabs() {
           variant="outlined"
           autoComplete="off"
         />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={cliente.retencion}
-              name="retencion"
-              onChange={handleCliente}
-              inputProps={{ "aria-label": "controlled" }}
-            />
-          }
-          label="Retención"
-        />
       </div>
       {/* TAB -------------------------------------------- */}
       {id !== "nuevo" && (
@@ -245,7 +332,10 @@ export default function BasicTabs() {
             </Tabs>
           </Box>
           <TabPanel value={tab} index={0}>
-            <Contactos contactos={contactos} />
+            <Contactos
+              initialRows={cliente.contactos}
+              handleContactos={handleContactos}
+            />
           </TabPanel>
           <TabPanel value={tab} index={1}>
             <Expedientes _id={cliente._id} />

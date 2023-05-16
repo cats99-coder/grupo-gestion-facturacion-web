@@ -50,13 +50,13 @@ function EditToolbar(props: EditToolbarProps) {
   return (
     <GridToolbarContainer>
       <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-        Nuevo Contacto
+        Nuevo Suplido
       </Button>
     </GridToolbarContainer>
   );
 }
 
-export default function Suplidos({ initialRows, handleContactos }) {
+export default function Suplidos({ initialRows, handleSuplidos }) {
   const [rows, setRows] = React.useState(initialRows);
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>(
     {}
@@ -65,7 +65,7 @@ export default function Suplidos({ initialRows, handleContactos }) {
     setRows(initialRows);
   }, [initialRows]);
   React.useEffect(() => {
-    handleContactos(rows);
+    handleSuplidos(rows);
   }, [rows]);
   const handleRowEditStart = (
     params: GridRowParams,
@@ -113,9 +113,14 @@ export default function Suplidos({ initialRows, handleContactos }) {
     setRowModesModel(newRowModesModel);
   };
   const columns: any = [
-    { field: "nombre", headerName: "Nombre", width: 150, editable: true },
-    { field: "apellido1", headerName: "Primer Apellido", width: 150, editable: true },
-    { field: "apellido2", headerName: "Segundo Apellido", width: 150, editable: true },
+    { field: "concepto", headerName: "Concepto", flex: 0.7, editable: true },
+    {
+      field: "importe",
+      headerName: "Importe",
+      flex: 0.3,
+      type: "number",
+      editable: true,
+    },
     {
       field: "actions",
       type: "actions",

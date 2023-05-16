@@ -21,12 +21,6 @@ export default function Expedientes({ _id }: { _id: string }) {
     { field: "numero_expediente", headerName: "Número Expediente", width: 150 },
     { field: "tipo", headerName: "Tipo", width: 100 },
     {
-      field: "cliente",
-      renderCell: (params) => params.row?.cliente?.nombre,
-      headerName: "Cliente",
-      width: 250,
-    },
-    {
       field: "fecha",
       type: "date",
       valueGetter: (params) => {
@@ -35,7 +29,6 @@ export default function Expedientes({ _id }: { _id: string }) {
       headerName: "Fecha",
       width: 150,
     },
-    { field: "usuario", headerName: "Usuario", width: 150 },
     { field: "concepto", headerName: "Concepto", width: 250 },
     { field: "importe", headerName: "Importe", width: 150 },
     { field: "suplidos", headerName: "Suplidos", width: 150 },

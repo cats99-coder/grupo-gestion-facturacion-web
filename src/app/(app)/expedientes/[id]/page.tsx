@@ -18,6 +18,7 @@ import { ClientesService } from "@/services/clientes.service";
 import { ToastContext } from "@/components/Providers";
 import { DateTime } from "luxon";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import Suplidos from "@/components/Expedientes/Suplidos";
 
 export default function Expediente() {
   const ObjectId = (rnd = (r16) => Math.floor(r16).toString(16)) =>
@@ -93,20 +94,16 @@ export default function Expediente() {
     DateTime.fromJSDate(new Date(Date.now()))
   );
   const [estados, setEstados] = React.useState([]);
-  const [newSuplido, setNewSuplido] = React.useState({
-    _id: "",
-    concepto: "",
-    importe: 0,
-  });
+
   const [newEstado, setNewEstado] = React.useState({
     _id: "",
     concepto: "",
     fecha: 0,
   });
-  const handleNewSuplido = () => {
+  const handleSuplido = (suplidos) => {
     setExpediente({
       ...expediente,
-      suplidos: [...expediente.suplidos, newSuplido],
+      suplidos,
     });
   };
   const { id } = useParams();
@@ -331,88 +328,39 @@ export default function Expediente() {
           autoComplete="off"
         />
       </div>
-      <div className="w-full grid grid-rows-[min-content_minmax(0,1fr)] h-full gap-y-2">
-        <div className="flex justify-end">
-          <Button disabled={facturado} onClick={() => setOpenNew(true)}>
-            Añadir
-          </Button>
-        </div>
-        <DataGrid
-          className=""
-          getRowId={(row) => row._id}
-          rows={expediente.suplidos}
-          columns={columns}
-          // onRowSelectionModelChange={handleSelection}
-        />
-        <Dialog open={openNew} onClose={handleClose}>
-          <DialogTitle>Nuevo contacto</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Introduzca los datos del suplemento
-            </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="suplido-concepto"
-              label="Concepto"
-              fullWidth
-              variant="outlined"
-              onChange={(e) =>
-                setNewSuplido({ ...newSuplido, concepto: e.target.value })
-              }
-            />
-            <TextField
-              margin="dense"
-              id="suplido-importe"
-              label="Importe"
-              type="number"
-              fullWidth
-              variant="outlined"
-              onChange={(e) =>
-                setNewSuplido({
-                  ...newSuplido,
-                  _id: ObjectId(),
-                  importe: Number(e.target.value),
-                })
-              }
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>Cancelar</Button>
-            <Button onClick={handleNewSuplido}>Crear</Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog open={openEstados} onClose={handleCloseEstados}>
-          <DialogTitle>Estados del expediente</DialogTitle>
-          <DialogContent>
-            <DialogContentText>Estados del expediente</DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              size="small"
-              id="suplido-concepto"
-              label="Concepto"
-              fullWidth
-              variant="outlined"
-              onChange={(e) =>
-                setNewEstado({ ...newEstado, concepto: e.target.value })
-              }
-            />
-            <DatePicker label="Fecha" sx={{ width: "100%" }} slots={{}} />
-            <DataGrid
-              className=""
-              getRowId={(row) => row._id}
-              rows={expediente.estados}
-              columns={columns}
-              // onRowSelectionModelChange={handleSelection}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>Cancelar</Button>
-            <Button onClick={handleNewSuplido}>Crear</Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+      <Suplidos
+        initialRows={expediente.suplidos}
+        handleSuplidos={handleSuplido}
+      />
+      <Dialog open={openEstados} onClose={handleCloseEstados}>
+        <DialogTitle>Estados del expediente</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Estados del expediente</DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            size="small"
+            id="suplido-concepto"
+            label="Concepto"
+            fullWidth
+            variant="outlined"
+            onChange={(e) =>
+              setNewEstado({ ...newEstado, concepto: e.target.value })
+            }
+          />
+          <DatePicker label="Fecha" sx={{ width: "100%" }} slots={{}} />
+          <DataGrid
+            className=""
+            getRowId={(row) => row._id}
+            rows={expediente.estados}
+            columns={columns}
+            // onRowSelectionModelChange={handleSelection}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEstados}>Cerrar</Button>
+        </DialogActions>
+      </Dialog>
       <div className="flex justify-end items-end gap-5">
         <div className="flex items-end justify-between gap-5 w-36">
           <span className="text-xl font-bold">Base</span>
