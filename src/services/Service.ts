@@ -1,7 +1,7 @@
 export class Service {
   URL = process.env.NEXT_PUBLIC_URL;
   async get(url: string) {
-    return await fetch(this.URL + url);
+    return await fetch(this.URL + url, {next: {revalidate: 0}});
   }
   async post(url: string, body: object = {}) {
     return await fetch(this.URL + url, {

@@ -21,7 +21,7 @@ export default function Header() {
         <span className="uppercase">Grupo Gestión</span>
       </div>
       <nav className="flex">
-        <ul>
+        <ul className="flex items-center">
           <NavLink href={"/usuarios"}>Usuarios</NavLink>
           <NavLink href={"/clientes"}>Clientes</NavLink>
           <NavLink href={"/expedientes"}>Expedientes</NavLink>

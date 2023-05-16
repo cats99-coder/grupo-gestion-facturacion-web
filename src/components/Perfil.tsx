@@ -7,11 +7,13 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { Avatar } from "@mui/material";
+import { deepPurple } from "@mui/material/colors";
 
 export default function Perfil() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const { user } = useContext<any>(AuthContext);
-  const router = useRouter()
+  const router = useRouter();
   const open = Boolean(anchorEl);
   const handleClose = () => {
     setAnchorEl(null);
@@ -22,7 +24,7 @@ export default function Perfil() {
   const logout = () => {
     Cookies.remove("token");
     handleClose();
-    router.push('/login')
+    router.push("/login");
   };
   return (
     <div>
@@ -33,7 +35,10 @@ export default function Perfil() {
         aria-expanded={open ? "true" : undefined}
         onClick={handleClick}
       >
-        {user.nombre}
+        <Avatar sx={{ bgcolor: deepPurple[500] }}>
+          {user.nombre.substring(0, 1)}
+        </Avatar>
+        <p className="ml-3 text-white font-bold">{user.nombre}</p>
       </Button>
       <Menu
         id="basic-menu"
@@ -44,9 +49,7 @@ export default function Perfil() {
           "aria-labelledby": "basic-button",
         }}
       >
-        <MenuItem onClick={handleClose}>Profile</MenuItem>
-        <MenuItem onClick={handleClose}>My account</MenuItem>
-        <MenuItem onClick={logout}>Logout</MenuItem>
+        <MenuItem onClick={logout}>Cerrar Sesión</MenuItem>
       </Menu>
     </div>
   );

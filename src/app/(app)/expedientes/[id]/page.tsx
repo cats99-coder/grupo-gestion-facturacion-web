@@ -3,13 +3,26 @@ import * as React from "react";
 import TextField from "@mui/material/TextField";
 import { useParams, useRouter } from "next/navigation";
 import { ExpedientesService } from "@/services/expedientes.service";
-import { Autocomplete, Button } from "@mui/material";
-import { ClientesService } from "@/services/clientes.service";
 import { DatePicker } from "@mui/x-date-pickers";
+
+import {
+  Autocomplete,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
+import { ClientesService } from "@/services/clientes.service";
 import { ToastContext } from "@/components/Providers";
 import { DateTime } from "luxon";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 export default function Expediente() {
+  const ObjectId = (rnd = (r16) => Math.floor(r16).toString(16)) =>
+    rnd(Date.now() / 1000) +
+    " ".repeat(16).replace(/./g, () => rnd(Math.random() * 16));
   interface Expediente {
     _id: string;
     numero_expediente: string;
@@ -19,11 +32,23 @@ export default function Expediente() {
     concepto: string;
     tipo: "FISCAL" | "GESTORIA" | "ABOGACIA";
     importe: number;
-    suplidos: number;
     colaborador: number;
+    provisiones: number;
     cobrado: number;
     IVA: number;
     factura: Factura;
+    suplidos: Suplido[];
+    estados: Estado[];
+  }
+  interface Suplido {
+    _id?: string;
+    concepto: string;
+    importe: number;
+  }
+  interface Estado {
+    _id?: string;
+    concepto: string;
+    fecha: Date;
   }
   interface Cliente {
     _id: string;
@@ -52,7 +77,8 @@ export default function Expediente() {
     concepto: "",
     tipo: "FISCAL",
     importe: 0,
-    suplidos: 0,
+    provisiones: 0,
+    suplidos: [],
     colaborador: 0,
     cobrado: 0,
     IVA: 0,
@@ -61,10 +87,28 @@ export default function Expediente() {
       numero_factura: 0,
       serie: 0,
     },
+    estados: [],
   });
   const [fecha, setFecha] = React.useState<DateTime | null>(
     DateTime.fromJSDate(new Date(Date.now()))
   );
+  const [estados, setEstados] = React.useState([]);
+  const [newSuplido, setNewSuplido] = React.useState({
+    _id: "",
+    concepto: "",
+    importe: 0,
+  });
+  const [newEstado, setNewEstado] = React.useState({
+    _id: "",
+    concepto: "",
+    fecha: 0,
+  });
+  const handleNewSuplido = () => {
+    setExpediente({
+      ...expediente,
+      suplidos: [...expediente.suplidos, newSuplido],
+    });
+  };
   const { id } = useParams();
   React.useEffect(() => {
     if (id !== "nuevo") {
@@ -93,9 +137,6 @@ export default function Expediente() {
   const handleExpedienteCliente = (e: any, value: Cliente) => {
     setExpediente({ ...expediente, cliente: value });
   };
-  const handleExpedienteConcepto = (e: any, value: Concepto) => {
-    setExpediente({ ...expediente, concepto: value.nombre });
-  };
   const handleExpedienteTipo = (
     e: any,
     value: "FISCAL" | "GESTORIA" | "ABOGACIA"
@@ -115,7 +156,6 @@ export default function Expediente() {
     } else {
       const { _id, numero_expediente, factura, ...createExpediente } =
         expediente;
-      console.log(expediente);
       new ExpedientesService()
         .create(createExpediente)
         .then(async (response) => {
@@ -124,14 +164,50 @@ export default function Expediente() {
         });
     }
   };
+  const total = React.useMemo(() => {
+    const suplidos = expediente.suplidos.reduce((suma, suplido) => {
+      return suma + suplido.importe;
+    }, 0);
+    const base = Number(expediente.importe);
+    const IVA = Number(expediente.importe) * (Number(expediente.IVA) / 100);
+    const total = base + IVA + Number(suplidos);
+    return {
+      base,
+      suplidos,
+      IVA,
+      total,
+    };
+  }, [expediente, expediente.suplidos]);
   const router = useRouter();
   const goToInvoice = () => {
     router.push(`/facturas/${expediente.factura._id}`);
   };
-  const servicios = [{ concepto: "RENTA" }];
+  const [openNew, setOpenNew] = React.useState(false);
+  const [openEstados, setOpenEstados] = React.useState(false);
+  const columns: GridColDef[] = [
+    { field: "concepto", headerName: "Concepto", width: 300, editable: true },
+    { field: "importe", headerName: "Importe", width: 150, editable: true },
+  ];
+  const columnsEstados: GridColDef[] = [
+    { field: "concepto", headerName: "Concepto", width: 300, editable: true },
+    {
+      field: "fecha",
+      headerName: "Fecha",
+      type: "date",
+      width: 150,
+      editable: true,
+    },
+  ];
+  const handleClose = () => {
+    setOpenNew(false);
+  };
+  const handleCloseEstados = () => {
+    setOpenEstados(false);
+  };
   return (
-    <section className="h-full grid grid-rows-[min-content_min-content_minmax(0,1fr)] gap-y-2">
+    <section className="h-full grid grid-rows-[min-content_min-content_minmax(0,1fr)_min-content] gap-y-2">
       <div className="flex justify-end items-center">
+        <Button onClick={() => setOpenEstados(true)}>VER ESTADO</Button>
         {!facturado && (
           <Button onClick={saveExpediente}>
             {id !== "nuevo" ? "Guardar" : "Crear"}
@@ -191,22 +267,8 @@ export default function Expediente() {
           onChange={handleExpedienteTipo}
           renderInput={(params) => <TextField {...params} label="Tipo" />}
         />
-        {/* <Autocomplete
-          options={servicios}
-          size="small"
-          className="col-span-3"
-          value={expediente.concepto}
-          disabled={facturado}
-          onChange={handleExpedienteConcepto}
-          isOptionEqualToValue={(cliente, value) => {
-            if (!value) return false;
-            return cliente.concepto === value;
-          }}
-          getOptionLabel={(option) => option.concepto}
-          renderInput={(params) => <TextField {...params} label="Concepto" />}
-        /> */}
         <TextField
-          className="col-span-3"
+          className="col-span-4"
           size="small"
           onChange={handleExpediente}
           name="concepto"
@@ -248,11 +310,11 @@ export default function Expediente() {
           type={"number"}
           size="small"
           onChange={handleExpediente}
-          name="suplidos"
+          name="provisiones"
           disabled={facturado}
-          value={expediente.suplidos}
-          id="suplidos"
-          label="Suplidos"
+          value={expediente.provisiones}
+          id="provisiones"
+          label="Provisiones"
           variant="outlined"
           autoComplete="off"
         />
@@ -268,6 +330,110 @@ export default function Expediente() {
           variant="outlined"
           autoComplete="off"
         />
+      </div>
+      <div className="w-full grid grid-rows-[min-content_minmax(0,1fr)] h-full gap-y-2">
+        <div className="flex justify-end">
+          <Button disabled={facturado} onClick={() => setOpenNew(true)}>
+            Añadir
+          </Button>
+        </div>
+        <DataGrid
+          className=""
+          getRowId={(row) => row._id}
+          rows={expediente.suplidos}
+          columns={columns}
+          // onRowSelectionModelChange={handleSelection}
+        />
+        <Dialog open={openNew} onClose={handleClose}>
+          <DialogTitle>Nuevo contacto</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Introduzca los datos del suplemento
+            </DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="suplido-concepto"
+              label="Concepto"
+              fullWidth
+              variant="outlined"
+              onChange={(e) =>
+                setNewSuplido({ ...newSuplido, concepto: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              id="suplido-importe"
+              label="Importe"
+              type="number"
+              fullWidth
+              variant="outlined"
+              onChange={(e) =>
+                setNewSuplido({
+                  ...newSuplido,
+                  _id: ObjectId(),
+                  importe: Number(e.target.value),
+                })
+              }
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Cancelar</Button>
+            <Button onClick={handleNewSuplido}>Crear</Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog open={openEstados} onClose={handleCloseEstados}>
+          <DialogTitle>Estados del expediente</DialogTitle>
+          <DialogContent>
+            <DialogContentText>Estados del expediente</DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              size="small"
+              id="suplido-concepto"
+              label="Concepto"
+              fullWidth
+              variant="outlined"
+              onChange={(e) =>
+                setNewEstado({ ...newEstado, concepto: e.target.value })
+              }
+            />
+            <DatePicker label="Fecha" sx={{ width: "100%" }} slots={{}} />
+            <DataGrid
+              className=""
+              getRowId={(row) => row._id}
+              rows={expediente.estados}
+              columns={columns}
+              // onRowSelectionModelChange={handleSelection}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Cancelar</Button>
+            <Button onClick={handleNewSuplido}>Crear</Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+      <div className="flex justify-end items-end gap-5">
+        <div className="flex items-end justify-between gap-5 w-36">
+          <span className="text-xl font-bold">Base</span>
+          <span className="text-lg font-semibold">{total.base}</span>
+          <span className="text-lg font-semibold">€</span>
+        </div>
+        <div className="flex items-end justify-between gap-5 w-36">
+          <span className="text-xl font-bold">IVA</span>
+          <span className="text-lg font-semibold">{total.IVA}</span>
+          <span className="text-lg font-semibold">€</span>
+        </div>
+        <div className="flex items-end justify-between gap-5 w-48">
+          <span className="text-xl font-bold">Suplidos</span>
+          <span className="text-lg font-semibold">{total.suplidos}</span>
+          <span className="text-lg font-semibold">€</span>
+        </div>
+        <div className="flex items-end justify-between gap-5 w-52">
+          <span className="text-3xl font-bold">Total</span>
+          <span className="text-2xl font-semibold">{total.total}</span>
+          <span className="text-2xl font-semibold">€</span>
+        </div>
       </div>
     </section>
   );

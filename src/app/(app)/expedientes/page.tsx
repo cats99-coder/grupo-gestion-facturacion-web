@@ -36,10 +36,18 @@ export default function Clientes() {
       headerName: "Fecha",
       width: 150,
     },
-    { field: "usuario", headerName: "Usuario", width: 150 },
     { field: "concepto", headerName: "Concepto", width: 250 },
     { field: "importe", headerName: "Importe", width: 150 },
-    { field: "suplidos", headerName: "Suplidos", width: 150 },
+    {
+      field: "suplidos",
+      headerName: "Suplidos",
+      width: 150,
+      valueGetter(params) {
+        return params.row.suplidos.reduce((suma: number, suplido: any) => {
+          return suma + Number(suplido.importe);
+        }, 0);
+      },
+    },
     { field: "colaborador", headerName: "Colaborador", width: 150 },
     { field: "cobrado", headerName: "Cobrado", width: 150 },
   ];
