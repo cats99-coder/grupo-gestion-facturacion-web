@@ -50,7 +50,6 @@ export default function Facturas() {
     },
     { field: "numero_factura", headerName: "Número Factura", width: 150 },
     { field: "serie", headerName: "Número Serie", width: 150 },
-    { field: "tipo", headerName: "Tipo", width: 150 },
     {
       field: "cliente",
       renderCell: (params) => params.row?.cliente?.nombre,

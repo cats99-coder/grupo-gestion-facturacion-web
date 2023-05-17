@@ -31,7 +31,6 @@ export default function Expediente() {
     fecha: Date;
     usuario: Usuario | null;
     concepto: string;
-    tipo: "FISCAL" | "GESTORIA" | "ABOGACIA";
     importe: number;
     colaborador: number;
     provisiones: number;
@@ -76,7 +75,6 @@ export default function Expediente() {
     fecha: new Date(Date.now()),
     usuario: null,
     concepto: "",
-    tipo: "FISCAL",
     importe: 0,
     provisiones: 0,
     suplidos: [],
@@ -133,12 +131,6 @@ export default function Expediente() {
     React.useContext<any>(ToastContext);
   const handleExpedienteCliente = (e: any, value: Cliente) => {
     setExpediente({ ...expediente, cliente: value });
-  };
-  const handleExpedienteTipo = (
-    e: any,
-    value: "FISCAL" | "GESTORIA" | "ABOGACIA"
-  ) => {
-    setExpediente({ ...expediente, tipo: value });
   };
   const saveExpediente = () => {
     if (id !== "nuevo") {
@@ -244,7 +236,7 @@ export default function Expediente() {
         />
         <Autocomplete
           options={clientes}
-          className="col-span-2"
+          className="col-span-3"
           size="small"
           value={expediente.cliente}
           disabled={facturado}
@@ -255,14 +247,6 @@ export default function Expediente() {
           }}
           getOptionLabel={(option) => option.nombre}
           renderInput={(params) => <TextField {...params} label="cliente" />}
-        />
-        <Autocomplete
-          options={["FISCAL", "GESTORIA", "ABOGACIA"]}
-          size="small"
-          value={expediente.tipo}
-          disabled={facturado}
-          onChange={handleExpedienteTipo}
-          renderInput={(params) => <TextField {...params} label="Tipo" />}
         />
         <TextField
           className="col-span-4"

@@ -20,7 +20,6 @@ export default function Clientes() {
   const router = useRouter();
   const columns: GridColDef[] = [
     { field: "numero_expediente", headerName: "Número Expediente", width: 150 },
-    { field: "tipo", headerName: "Tipo", width: 100 },
     {
       field: "cliente",
       renderCell: (params) => params.row?.cliente?.nombre,

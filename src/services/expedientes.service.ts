@@ -1,6 +1,5 @@
 import { Service } from "./Service";
 
-
 export class ExpedientesService extends Service {
   async getAll() {
     return await this.get("/expedientes");
@@ -17,7 +16,7 @@ export class ExpedientesService extends Service {
   async update(_id: string, expediente) {
     return await this.post(`/expedientes/${_id}`, expediente);
   }
-  async porFacturar(departamento: string | undefined) {
-    return await this.post(`/expedientes/porFacturar`, { departamento });
+  async porFacturar() {
+    return await this.post(`/expedientes/porFacturar`, {});
   }
 }

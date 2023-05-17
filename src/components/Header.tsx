@@ -22,7 +22,6 @@ export default function Header() {
       </div>
       <nav className="flex">
         <ul className="flex items-center">
-          <NavLink href={"/usuarios"}>Usuarios</NavLink>
           <NavLink href={"/clientes"}>Clientes</NavLink>
           <NavLink href={"/expedientes"}>Expedientes</NavLink>
           <NavLink href={"/facturas"}>Facturas</NavLink>

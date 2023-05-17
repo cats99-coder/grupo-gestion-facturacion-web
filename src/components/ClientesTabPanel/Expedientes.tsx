@@ -19,7 +19,6 @@ export default function Expedientes({ _id }: { _id: string }) {
   }, []);
   const columns: GridColDef[] = [
     { field: "numero_expediente", headerName: "Número Expediente", width: 150 },
-    { field: "tipo", headerName: "Tipo", width: 100 },
     {
       field: "fecha",
       type: "date",
