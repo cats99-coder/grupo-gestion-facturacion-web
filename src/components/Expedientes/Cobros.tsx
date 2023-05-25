@@ -11,7 +11,6 @@ import {
   GridRowModesModel,
   GridRowModes,
   DataGrid,
-  GridColDef,
   GridRowParams,
   MuiEvent,
   GridToolbarContainer,
@@ -19,7 +18,10 @@ import {
   GridEventListener,
   GridRowId,
   GridRowModel,
+  GridColDef,
 } from "@mui/x-data-grid";
+import { Autocomplete, TextField } from "@mui/material";
+import { UsuariosService } from "@/services/usuarios.service";
 
 const ObjectId = (rnd = (r16) => Math.floor(r16).toString(16)) =>
   rnd(Date.now() / 1000) +
@@ -50,22 +52,30 @@ function EditToolbar(props: EditToolbarProps) {
   return (
     <GridToolbarContainer>
       <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-        Nuevo Suplido
+        Nuevo Cobro
       </Button>
     </GridToolbarContainer>
   );
 }
 
-export default function Suplidos({ initialRows, handleSuplidos, facturado }) {
+export default function Cobros({ initialRows, handleCobros }) {
   const [rows, setRows] = React.useState(initialRows);
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>(
     {}
   );
+
+  const [colaboradores, setColaboradores] = React.useState<Array<Cobro>>([]);
+  React.useEffect(() => {
+    new UsuariosService().getAll().then(async (response) => {
+      const res: Array<Cobro> = await response.json();
+      setColaboradores(res);
+    });
+  }, []);
   React.useEffect(() => {
     setRows(initialRows);
   }, [initialRows]);
   React.useEffect(() => {
-    handleSuplidos(rows);
+    handleCobros(rows);
   }, [rows]);
   const handleRowEditStart = (
     params: GridRowParams,
@@ -108,27 +118,50 @@ export default function Suplidos({ initialRows, handleSuplidos, facturado }) {
     setRows(rows.map((row) => (row._id === newRow._id ? updatedRow : row)));
     return updatedRow;
   };
-  const getTogglableColumns = (columns: GridColDef[]) => {
-    return columns;
+  const handleTipo = (id: string, tipo: CobroType | null) => {
+    setRows(rows.map((row) => (row._id === id ? { ...row, tipo } : row)));
   };
 
   const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
     setRowModesModel(newRowModesModel);
   };
-  const columns: GridColDef[] = [
-    { field: "concepto", headerName: "Concepto", flex: 0.7, editable: true },
+  const tipos: CobroType[] = ["BIZUM C", "EFECTIVO R"];
+  const columns: GridColDef = [
+    {
+      field: "tipo",
+      headerName: "Tipo",
+      width: 350,
+      renderCell(params) {
+        return (
+          <div className="p-2">
+            <Autocomplete
+              // disablePortal
+              id="combo-box-demo"
+              options={tipos}
+              value={params.row.tipo}
+              onChange={(e, value: CobroType | null) =>
+                handleTipo(params.id, value)
+              }
+              sx={{ width: 300 }}
+              renderInput={(params) => (
+                <TextField {...params} size="small" label="" />
+              )}
+            />
+          </div>
+        );
+      },
+    },
     {
       field: "importe",
       headerName: "Importe",
-      flex: 0.3,
-      type: "number",
+      width: 150,
       editable: true,
     },
     {
       field: "actions",
       type: "actions",
       headerName: "Acciones",
-      width: 150,
+      width: 100,
       cellClassName: "actions",
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
@@ -148,6 +181,7 @@ export default function Suplidos({ initialRows, handleSuplidos, facturado }) {
             />,
           ];
         }
+
         return [
           <GridActionsCellItem
             icon={<EditIcon />}
@@ -192,7 +226,7 @@ export default function Suplidos({ initialRows, handleSuplidos, facturado }) {
         onRowEditStop={handleRowEditStop}
         processRowUpdate={processRowUpdate}
         slots={{
-          toolbar: !facturado ? EditToolbar : null,
+          toolbar: EditToolbar,
         }}
         getRowId={(row) => row._id}
         slotProps={{

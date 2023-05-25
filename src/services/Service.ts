@@ -3,7 +3,6 @@ import Cookies from "js-cookie";
 export class Service {
   URL = process.env.NEXT_PUBLIC_URL;
   async get(url: string) {
-    console.log(`Bearer ${Cookies.get("token")}`);
     return await fetch(this.URL + url, {
       next: { revalidate: 0 },
       headers: {
@@ -13,7 +12,6 @@ export class Service {
     });
   }
   async post(url: string, body: object = {}) {
-    console.log(`Bearer ${Cookies.get("token")}`);
     return await fetch(this.URL + url, {
       method: "POST",
       headers: {

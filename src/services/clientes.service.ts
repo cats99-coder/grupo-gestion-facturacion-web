@@ -1,7 +1,7 @@
 import { Service } from "./Service";
 
 interface Cliente {
-  _id: string;
+  _id?: string;
   NIF: string;
   tipo: "EMPRESA" | "PERSONA";
   razon_social?: string;

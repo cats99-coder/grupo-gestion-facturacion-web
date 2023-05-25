@@ -4,13 +4,13 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Contactos from "@/components/ClientesTabPanel/Contactos";
 import Expedientes from "@/components/ClientesTabPanel/Expedientes";
 import { Button, Checkbox, FormControlLabel } from "@mui/material";
 import { ClientesService } from "@/services/clientes.service";
 import Facturas from "@/components/ClientesTabPanel/Facturas";
-import { AuthContext } from "@/components/Providers";
+import { AuthContext, ToastContext } from "@/components/Providers";
 import { useContext } from "react";
 import Documentos from "@/components/ClientesTabPanel/Documentos";
 import ToggleButton from "@mui/material/ToggleButton";
@@ -118,18 +118,29 @@ export default function BasicTabs() {
       setCliente({ ...cliente, [e.target.name]: e.target.value });
     }
   };
+  const { setOpenSuccess, setMessageSuccess } =
+    React.useContext<any>(ToastContext);
   const handleTipo = (
     event: React.MouseEvent<HTMLElement>,
     newAlignment: string | null
   ) => {
     setCliente({ ...cliente, tipo: newAlignment });
   };
+  const router = useRouter();
   const saveClient = () => {
     if (id !== "nuevo") {
-      new ClientesService().update(id, cliente);
+      new ClientesService().update(id, cliente).then(async (response) => {
+        setOpenSuccess(true);
+        setMessageSuccess("Actualizado con éxito");
+      });
     } else {
       const { _id, ...createClient } = cliente;
-      new ClientesService().create(createClient).then(async (response) => {});
+      new ClientesService().create(createClient).then(async (response) => {
+        const res = await response.json();
+        router.push(`/clientes/${res?._id}`);
+        setOpenSuccess(true);
+        setMessageSuccess("Creado con éxito");
+      });
     }
   };
   const { user } = useContext<any>(AuthContext);
