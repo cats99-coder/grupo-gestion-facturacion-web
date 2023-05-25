@@ -8,13 +8,13 @@ import {
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FacturasService } from "@/services/facturas.service";
-import { Button } from "@mui/material";
+import { Autocomplete, Button, TextField } from "@mui/material";
 
 export default function Facturas() {
   const [facturas, setFacturas] = useState<GridRowsProp>([]);
   useEffect(() => {
     new FacturasService().getAll().then(async (response) => {
-      console.log(response.ok)
+      console.log(response.ok);
       setFacturas(await response.json());
     });
   }, []);
@@ -52,9 +52,9 @@ export default function Facturas() {
     { field: "serie", headerName: "Número Serie", width: 150 },
     {
       field: "cliente",
-      renderCell: (params) => params.row?.cliente?.nombre,
+      renderCell: (params) => params.row?.cliente?.nombreCompleto,
       headerName: "Cliente",
-      width: 150,
+      width: 300,
     },
     {
       field: "fecha",
@@ -65,6 +65,18 @@ export default function Facturas() {
       headerName: "Fecha",
       width: 150,
     },
+    {
+      field: "usuario",
+      renderCell: (params) => params.row?.tipo,
+      headerName: "Usuario",
+      width: 150,
+    },
+    {
+      field: "facturado_por",
+      renderCell: (params) => params.row?.usuario?.nombre,
+      headerName: "Facturado por",
+      width: 150,
+    },
   ];
   const handleRowClick: GridEventListener<"rowClick"> = (params) => {
     router.push(`/facturas/${params.id}/`);
@@ -72,10 +84,24 @@ export default function Facturas() {
   const handleNueva = () => {
     router.push(`/facturas/nueva/`);
   };
+  const tipos = ["RUBEN", "INMA", "ANDREA", "CRISTINA"];
+  const [tipo, setTipo] = useState<Tipos>([]);
   return (
     <div className="grid grid-cols-1 grid-rows-[min-content_minmax(0,1fr)] gap-y-2 h-full">
       <div className="flex justify-between items-center">
-        <h1 className="">Facturas</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="">Facturas</h1>
+          <Autocomplete
+            multiple={true}
+            options={tipos}
+            className="col-span-3"
+            size="small"
+            sx={{ width: 300 }}
+            value={tipo}
+            onChange={(e, value) => setTipo(value)}
+            renderInput={(params) => <TextField {...params} label="Usuario" />}
+          />
+        </div>
         <div className="flex items-center">
           <Button onClick={handleNueva}>Nueva</Button>
         </div>
@@ -86,7 +112,12 @@ export default function Facturas() {
         disableRowSelectionOnClick={true}
         onRowClick={handleRowClick}
         checkboxSelection
-        rows={facturas}
+        rows={facturas.filter((factura) => {
+          if (tipo.length === 0) {
+            return true;
+          }
+          return tipo.includes(factura.tipo);
+        })}
         columns={columns}
       />
     </div>

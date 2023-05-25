@@ -208,7 +208,7 @@ export default function ExpedienteLayout({
             if (!value) return false;
             return cliente._id === value._id;
           }}
-          getOptionLabel={(option) => option.nombre}
+          getOptionLabel={(option) => option.nombreCompleto}
           renderInput={(params) => <TextField {...params} label="cliente" />}
         />
         <TextField

@@ -2,15 +2,18 @@ interface Usuario {
   _id: string;
   nombre: string;
 }
+type Tipo = "RUBEN" | "INMA" | "ANDREA" | "CRISTINA";
+type Tipos = Array<Tipo>;
 interface Cliente {
   _id: string;
   nombre: string;
+  nombreCompleto: string;
 }
 interface Colaborador {
   _id: string;
   nombre: string;
 }
-type CobroType = 'BIZUM C' | "EFECTIVO R"
+type CobroType = "BIZUM C" | "EFECTIVO R";
 interface Cobro {
   _id: string;
   tipo: CobroType;

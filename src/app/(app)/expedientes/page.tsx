@@ -7,8 +7,10 @@ import {
 } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@mui/material";
+import { Autocomplete, Button, TextField } from "@mui/material";
 import { ExpedientesService } from "@/services/expedientes.service";
+import { price } from "@/utils/Format";
+import { textSpanIntersectsWithPosition } from "typescript";
 
 export default function Clientes() {
   const [clientes, setClientes] = useState<GridRowsProp>([]);
@@ -22,8 +24,13 @@ export default function Clientes() {
     { field: "numero_expediente", headerName: "Número Expediente", width: 150 },
     {
       field: "cliente",
-      renderCell: (params) => params.row?.cliente?.nombre,
+      renderCell: (params) => params.row?.cliente?.nombreCompleto,
       headerName: "Cliente",
+      width: 250,
+    },
+    {
+      field: "tipo",
+      headerName: "Usuario",
       width: 250,
     },
     {
@@ -36,19 +43,53 @@ export default function Clientes() {
       width: 150,
     },
     { field: "concepto", headerName: "Concepto", width: 250 },
-    { field: "importe", headerName: "Importe", width: 150 },
+    {
+      field: "importe",
+      headerName: "Importe",
+      valueGetter(params) {
+        return price(params.row.importe);
+      },
+      width: 150,
+    },
     {
       field: "suplidos",
       headerName: "Suplidos",
       width: 150,
       valueGetter(params) {
-        return params.row.suplidos.reduce((suma: number, suplido: any) => {
-          return suma + Number(suplido.importe);
-        }, 0);
+        const total = params.row.suplidos.reduce(
+          (suma: number, suplido: any) => {
+            return suma + Number(suplido.importe);
+          },
+          0
+        );
+        return price(total);
       },
     },
-    { field: "colaborador", headerName: "Colaborador", width: 150 },
-    { field: "cobrado", headerName: "Cobrado", width: 150 },
+    {
+      field: "colaboradores",
+      headerName: "Colaboradores",
+      valueGetter(params) {
+        const total = params.row.colaboradores.reduce(
+          (suma: number, colaborador: any) => {
+            return suma + Number(colaborador.importe);
+          },
+          0
+        );
+        return price(total);
+      },
+      width: 150,
+    },
+    {
+      field: "cobros",
+      headerName: "Cobrado",
+      valueGetter(params) {
+        const total = params.row.cobros.reduce((suma: number, cobro: any) => {
+          return suma + Number(cobro.importe);
+        }, 0);
+        return price(total);
+      },
+      width: 150,
+    },
   ];
   const handleRowClick: GridEventListener<"rowClick"> = (params) => {
     router.push(`/expedientes/${params.id}/`);
@@ -56,10 +97,24 @@ export default function Clientes() {
   const handleNuevo = () => {
     router.push(`/expedientes/nuevo/`);
   };
+  const tipos = ["RUBEN", "INMA", "ANDREA", "CRISTINA"];
+  const [tipo, setTipo] = useState<Tipos>([]);
   return (
     <div className="grid grid-cols-1 grid-rows-[min-content_minmax(0,1fr)] gap-y-2 h-full">
       <div className="flex justify-between items-center">
-        <h1 className="">Expedientes</h1>
+        <div className="flex gap-2 items-center">
+          <h1 className="">Expedientes</h1>
+          <Autocomplete
+            multiple={true}
+            options={tipos}
+            className="col-span-3"
+            size="small"
+            sx={{ width: 300 }}
+            value={tipo}
+            onChange={(e, value) => setTipo(value)}
+            renderInput={(params) => <TextField {...params} label="Usuario" />}
+          />
+        </div>
         <div className="flex items-center">
           <Button onClick={handleNuevo}>Nuevo</Button>
         </div>
@@ -70,7 +125,12 @@ export default function Clientes() {
         disableRowSelectionOnClick={true}
         onRowClick={handleRowClick}
         checkboxSelection
-        rows={clientes}
+        rows={clientes.filter((cliente) => {
+          if (tipo.length === 0) {
+            return true;
+          }
+          return tipo.includes(cliente.tipo);
+        })}
         columns={columns}
       />
     </div>
