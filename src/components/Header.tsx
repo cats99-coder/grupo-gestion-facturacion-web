@@ -25,6 +25,7 @@ export default function Header() {
           <NavLink href={"/clientes"}>Clientes</NavLink>
           <NavLink href={"/expedientes"}>Expedientes</NavLink>
           <NavLink href={"/facturas"}>Facturas</NavLink>
+          <NavLink href={"/colaboradores"}>Colaboradores</NavLink>
         </ul>
         <Perfil />
       </nav>

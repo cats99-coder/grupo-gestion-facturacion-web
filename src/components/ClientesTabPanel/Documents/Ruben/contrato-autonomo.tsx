@@ -43,11 +43,10 @@ export default function RubenContratoAutonomo({
       });
   };
   const [datos, setDatos] = useState({
-    precio_servicio_fiscal: 0,
-    precio_alta_baja: 0,
-    precio_servicio_laboral: 0,
-    precio_servicio_laboral_primer: 0,
-    precio_servicio_laboral_siguientes: 0,
+    precio_servicio_fiscal: 60,
+    precio_alta_baja: 90,
+    precio_servicio_laboral: 37,
+    precio_servicio_laboral_siguientes: 15,
   });
   const handleDatos = (e: ChangeEvent<HTMLInputElement>) => {
     setDatos({ ...datos, [e.target.name]: e.target.value });
@@ -64,6 +63,7 @@ export default function RubenContratoAutonomo({
           id="servicio_fiscal"
           label="Servicio Fiscal"
           type="number"
+          value={datos.precio_servicio_fiscal}
           name="precio_servicio_fiscal"
           onChange={handleDatos}
           fullWidth
@@ -75,6 +75,7 @@ export default function RubenContratoAutonomo({
           id="alta_baja"
           label="Alta y Baja"
           type="number"
+          value={datos.precio_alta_baja}
           name="precio_alta_baja"
           onChange={handleDatos}
           fullWidth
@@ -86,18 +87,8 @@ export default function RubenContratoAutonomo({
           id="servicio_laboral"
           label="Servicio Laboral"
           type="number"
+          value={datos.precio_servicio_laboral}
           name="precio_servicio_laboral"
-          onChange={handleDatos}
-          fullWidth
-          variant="outlined"
-        />
-        <TextField
-          size="small"
-          margin="dense"
-          id="servicio_laboral"
-          label="Servicio Laboral. Primer Trbajador"
-          type="number"
-          name="precio_servicio_laboral_primer"
           onChange={handleDatos}
           fullWidth
           variant="outlined"
@@ -108,6 +99,7 @@ export default function RubenContratoAutonomo({
           id="servicio_laboral"
           label="Servicio Laboral. Siguientes trabajadores"
           type="number"
+          value={datos.precio_servicio_laboral_siguientes}
           name="precio_servicio_laboral_siguientes"
           onChange={handleDatos}
           fullWidth

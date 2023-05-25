@@ -5,9 +5,30 @@ interface Usuario {
 type Tipo = "RUBEN" | "INMA" | "ANDREA" | "CRISTINA";
 type Tipos = Array<Tipo>;
 interface Cliente {
+  _id?: string;
+  NIF: string;
+  tipo: "EMPRESA" | "PERSONA";
+  razon_social?: string;
+  nombre?: string;
+  apellido1?: string;
+  apellido2?: string;
+  numero_cuenta: string;
+  email: string;
+  codigo_postal: string;
+  localidad: string;
+  provincia: string;
+  pais: string;
+  retencion: boolean;
+  contactos: Contacto[];
+}
+interface Contacto {
   _id: string;
   nombre: string;
-  nombreCompleto: string;
+  apellido1: string;
+  apellido2: string;
+  telefono: string;
+  email: string;
+  relacion: string;
 }
 interface Colaborador {
   _id: string;
