@@ -1,3 +1,4 @@
+import { GridRowSelectionModel } from "@mui/x-data-grid";
 import { Service } from "./Service";
 
 export class FacturasService extends Service {
@@ -9,6 +10,9 @@ export class FacturasService extends Service {
   }
   async imprimir(id: string) {
     return await this.post(`/facturas/imprimir`, { id });
+  }
+  async generarExcel(facturas: GridRowSelectionModel) {
+    return await this.post(`/facturas/generarExcel`, { facturas });
   }
   async create(factura: any) {
     return await this.post(`/facturas`, factura);

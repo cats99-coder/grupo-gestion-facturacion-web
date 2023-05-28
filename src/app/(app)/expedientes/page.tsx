@@ -4,6 +4,7 @@ import {
   GridRowsProp,
   GridColDef,
   GridEventListener,
+  GridValidRowModel,
 } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -11,11 +12,19 @@ import { Autocomplete, Button, TextField } from "@mui/material";
 import { ExpedientesService } from "@/services/expedientes.service";
 import { price } from "@/utils/Format";
 import { textSpanIntersectsWithPosition } from "typescript";
+import { ClientesService } from "@/services/clientes.service";
+import { DatePicker } from "@mui/x-date-pickers";
+import { DateTime } from "luxon";
 
-export default function Clientes() {
-  const [clientes, setClientes] = useState<GridRowsProp>([]);
+export default function Expedientes() {
+  const [expedientes, setExpedientes] = useState<GridRowsProp>([]);
   useEffect(() => {
     new ExpedientesService().getAll().then(async (response) => {
+      setExpedientes(await response.json());
+    });
+  }, []);
+  useEffect(() => {
+    new ClientesService().getAll().then(async (response) => {
       setClientes(await response.json());
     });
   }, []);
@@ -99,6 +108,22 @@ export default function Clientes() {
   };
   const tipos = ["RUBEN", "INMA", "ANDREA", "CRISTINA"];
   const [tipo, setTipo] = useState<Tipos>([]);
+  const [cliente, setCliente] = useState<Cliente[]>([]);
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [fechaInicio, setFechaInicio] = useState<DateTime | null>(null);
+  const [fechaFin, setFechaFin] = useState<DateTime | null>(null);
+  const checkFrom = (value: GridValidRowModel) => {
+    if (fechaInicio === null) return true;
+    if (DateTime.fromISO(value.fecha).diff(fechaInicio).valueOf() <= 0)
+      return false;
+    return true;
+  };
+  const checkUntil = (value: GridValidRowModel) => {
+    if (fechaFin === null) return true;
+    if (DateTime.fromISO(value.fecha).diff(fechaFin).valueOf() >= 0)
+      return false;
+    return true;
+  };
   return (
     <div className="grid grid-cols-1 grid-rows-[min-content_minmax(0,1fr)] gap-y-2 h-full">
       <div className="flex justify-between items-center">
@@ -114,6 +139,34 @@ export default function Clientes() {
             onChange={(e, value) => setTipo(value)}
             renderInput={(params) => <TextField {...params} label="Usuario" />}
           />
+          <Autocomplete
+            multiple={true}
+            options={clientes}
+            className="col-span-3"
+            size="small"
+            sx={{ width: 300 }}
+            value={cliente}
+            isOptionEqualToValue={(option, value) => {
+              return option._id === value._id;
+            }}
+            getOptionLabel={(value) => {
+              return value.nombreCompleto;
+            }}
+            onChange={(e, value) => setCliente(value)}
+            renderInput={(params) => <TextField {...params} label="Clientes" />}
+          />
+          <DatePicker
+            label="Fecha Inicio"
+            value={fechaInicio}
+            format="dd/MM/yyyy"
+            onChange={(value) => setFechaInicio(value)}
+          />
+          <DatePicker
+            label="Fecha Fin"
+            value={fechaFin}
+            format="dd/MM/yyyy"
+            onChange={(value) => setFechaFin(value)}
+          />
         </div>
         <div className="flex items-center">
           <Button onClick={handleNuevo}>Nuevo</Button>
@@ -125,12 +178,26 @@ export default function Clientes() {
         disableRowSelectionOnClick={true}
         onRowClick={handleRowClick}
         checkboxSelection
-        rows={clientes.filter((cliente) => {
-          if (tipo.length === 0) {
-            return true;
-          }
-          return tipo.includes(cliente.tipo);
-        })}
+        rows={expedientes
+          .filter((expediente) => {
+            if (tipo.length === 0) {
+              return true;
+            }
+            return tipo.includes(expediente.tipo);
+          })
+          .filter((expediente) => {
+            if (cliente.length === 0) {
+              return true;
+            }
+            return (
+              -1 !==
+              cliente.findIndex((value) => {
+                return expediente.cliente?._id === value._id;
+              })
+            );
+          })
+          .filter(checkFrom)
+          .filter(checkUntil)}
         columns={columns}
       />
     </div>

@@ -12,10 +12,12 @@ interface Cliente {
   nombre?: string;
   apellido1?: string;
   apellido2?: string;
+  nombreCompleto: string;
   numero_cuenta: string;
   email: string;
   codigo_postal: string;
   localidad: string;
+  telefono: string;
   provincia: string;
   pais: string;
   retencion: boolean;

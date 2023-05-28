@@ -26,6 +26,7 @@ import Totales, { totales } from "@/components/Expedientes/Totales";
 import { TabPanel, a11yProps } from "@/utils/Tabs";
 import Colaboradores from "@/components/Expedientes/Colaboradores";
 import Cobros from "@/components/Expedientes/Cobros";
+import { DateToDoce } from "@/utils";
 
 export default function ExpedienteLayout({
   children,
@@ -38,7 +39,7 @@ export default function ExpedienteLayout({
     _id: "",
     numero_expediente: "",
     cliente: null,
-    fecha: new Date(Date.now()),
+    fecha: DateToDoce(),
     usuario: null,
     concepto: "",
     importe: 0,
@@ -195,14 +196,17 @@ export default function ExpedienteLayout({
           sx={{ height: "100%" }}
           value={fecha}
           disabled={facturado}
-          onChange={(newValue) => setFecha(newValue)}
+          onChange={(newValue) =>
+            setFecha(
+              newValue?.set({ millisecond: 0, second: 0, minute: 0, hour: 0 })
+            )
+          }
         />
         <Autocomplete
           options={clientes}
           className="col-span-3"
           size="small"
           value={expediente.cliente}
-          disabled={facturado}
           onChange={handleExpedienteCliente}
           isOptionEqualToValue={(cliente, value) => {
             if (!value) return false;

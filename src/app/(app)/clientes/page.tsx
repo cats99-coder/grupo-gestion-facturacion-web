@@ -21,7 +21,7 @@ export default function Clientes() {
   const router = useRouter();
   const columns: GridColDef[] = [
     { field: "NIF", headerName: "NIF", width: 150 },
-    { field: "nombreCompleto", headerName: "Nombre / Razón Social", width: 300 },
+    { field: "nombreCompleto", headerName: "Nombre / Razón Social", width: 400},
     { field: "telefono", headerName: "Teléfono", width: 150 },
     { field: "email", headerName: "Email", width: 150 },
     { field: "numero_cuenta", headerName: "Número Cuenta", width: 150 },
@@ -42,7 +42,6 @@ export default function Clientes() {
       </div>
       <DataGrid
         getRowId={(row) => row._id}
-        autoHeight={true}
         disableRowSelectionOnClick={true}
         onRowClick={handleRowClick}
         checkboxSelection

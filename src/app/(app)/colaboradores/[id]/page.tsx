@@ -25,8 +25,7 @@ interface TabPanelProps {
 }
 
 function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
+  const { children, value, index, ...other } = props
   return (
     <div
       role="tabpanel"
@@ -50,33 +49,6 @@ function a11yProps(index: number) {
 
 export default function BasicTabs() {
   const [tab, setTab] = React.useState(0);
-  interface Cliente {
-    _id: string;
-    NIF: string;
-    tipo: "EMPRESA" | "PERSONA";
-    razon_social?: string;
-    nombre?: string;
-    apellido1?: string;
-    apellido2?: string;
-    numero_cuenta: string;
-    telefono: string;
-    email: string;
-    codigo_postal: string;
-    localidad: string;
-    provincia: string;
-    pais: string;
-    retencion: boolean;
-    contactos: Contacto[];
-  }
-  interface Contacto {
-    _id: string;
-    nombre: string;
-    apellido1: string;
-    apellido2: string;
-    telefono: string;
-    email: string;
-    relacion: string;
-  }
   const [cliente, setCliente] = React.useState<Cliente>({
     _id: "",
     NIF: "",
@@ -219,14 +191,14 @@ export default function BasicTabs() {
               onChange={handleChange}
               aria-label="basic tabs example"
             >
-              <Tab label="Contactos" {...a11yProps(0)} />
-              <Tab label="Expedientes" {...a11yProps(1)} />
+              <Tab label="Todos" {...a11yProps(0)} />
+              {/* <Tab label="Expedientes" {...a11yProps(1)} />
               <Tab label="Facturas" {...a11yProps(2)} />
-              <Tab label="Estadísticas" {...a11yProps(3)} />
+              <Tab label="Estadísticas" {...a11yProps(3)} /> */}
             </Tabs>
           </Box>
           <TabPanel value={tab} index={0}>
-      
+
           </TabPanel>
           {/* <TabPanel value={tab} index={1}>
             <Expedientes _id={cliente._id} />

@@ -59,7 +59,7 @@ export const totales = (expediente: Expediente): Total => {
     const base = Number(expediente.importe);
     const IVA = Number(expediente.importe) * (Number(expediente.IVA) / 100);
     const total = base + IVA + Number(suplidos);
-    const pendiente = total - suplidos - cobros - expediente.provisiones;
+    const pendiente = total - cobros - expediente.provisiones;
     return {
       base,
       suplidos,

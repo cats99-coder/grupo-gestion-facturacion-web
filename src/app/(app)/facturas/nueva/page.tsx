@@ -149,19 +149,17 @@ export default function Facturar() {
           />
         </div>
         <div className="flex items-center gap-2">
-          {tipoParaFacturar === "RUBEN" && (
-            <Autocomplete
-              options={[23, 22, 21]}
-              className="w-52"
-              disableClearable={true}
-              openOnFocus={true}
-              size="small"
-              value={serie}
-              getOptionLabel={(option) => String(option)}
-              onChange={(e, value) => setSerie(value)}
-              renderInput={(params) => <TextField {...params} label="Serie" />}
-            />
-          )}
+          <Autocomplete
+            options={[23, 22, 21]}
+            className="w-52"
+            disableClearable={true}
+            openOnFocus={true}
+            size="small"
+            value={serie}
+            getOptionLabel={(option) => String(option)}
+            onChange={(e, value) => setSerie(value)}
+            renderInput={(params) => <TextField {...params} label="Serie" />}
+          />
           <Autocomplete
             options={tipos}
             className="w-52"
@@ -171,7 +169,9 @@ export default function Facturar() {
             value={tipoParaFacturar}
             getOptionLabel={(option) => String(option)}
             onChange={(e, value) => setTipoParaFacturar(value)}
-            renderInput={(params) => <TextField {...params} label="Facturar a nombre de" />}
+            renderInput={(params) => (
+              <TextField {...params} label="Facturar a nombre de" />
+            )}
           />
           <Button onClick={facturar}>Facturar</Button>
         </div>

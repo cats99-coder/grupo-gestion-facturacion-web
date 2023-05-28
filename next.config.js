@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = () => {
+
   const rewrites = () => {
     return [
       {
@@ -9,6 +10,15 @@ const nextConfig = () => {
     ];
   };
   return {
+    async redirects() {
+      return [
+        {
+          source: '/',
+          destination: '/expedientes',
+          permanent: true,
+        },
+      ];
+    },
     rewrites,
     experimental: {
       appDir: true,
