@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation";
 function NavLink({ href, children }: { href: string; children: ReactNode }) {
   const path = usePathname();
   const isActive = (() => {
-    return href.startsWith(path);
+    return path.startsWith(href);
   })();
   return (
     <Link

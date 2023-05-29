@@ -16,6 +16,10 @@ export class ExpedientesService extends Service {
   async update(_id: string, expediente) {
     return await this.post(`/expedientes/${_id}`, expediente);
   }
+  async borrar(_id: string) {
+    console.log(_id);
+    return await this.delete(`/expedientes/${_id}`);
+  }
   async porFacturar() {
     return await this.post(`/expedientes/porFacturar`, {});
   }

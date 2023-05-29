@@ -166,8 +166,7 @@ export default function ExpedienteLayout({
         {facturado && (
           <>
             <span className="mr-2">
-              Factura nº {expediente.factura.numero_factura}{" "}
-              {expediente?.factura?.serie && `/ ${expediente?.factura?.serie}`}
+              Factura nº {expediente.factura.numero_factura}
             </span>
             <Button onClick={goToInvoice}>Ver Factura</Button>
           </>

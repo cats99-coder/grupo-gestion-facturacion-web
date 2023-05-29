@@ -6,7 +6,7 @@ import {
   GridEventListener,
   GridValidRowModel,
 } from "@mui/x-data-grid";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useRouter } from "next/navigation";
 import { Autocomplete, Button, TextField } from "@mui/material";
 import { ExpedientesService } from "@/services/expedientes.service";
@@ -15,6 +15,7 @@ import { textSpanIntersectsWithPosition } from "typescript";
 import { ClientesService } from "@/services/clientes.service";
 import { DatePicker } from "@mui/x-date-pickers";
 import { DateTime } from "luxon";
+import { ToastContext } from "@/components/Providers";
 
 export default function Expedientes() {
   const [expedientes, setExpedientes] = useState<GridRowsProp>([]);
@@ -28,7 +29,31 @@ export default function Expedientes() {
       setClientes(await response.json());
     });
   }, []);
+  const {
+    setOpenWarning,
+    setMessageWarning,
+    setOpenSuccess,
+    setMessageSuccess,
+  } = useContext<any>(ToastContext);
   const router = useRouter();
+  const deleteExpediente = (e: any, _id: string) => {
+    console.log("Eliminar");
+    e.stopPropagation();
+    new ExpedientesService()
+      .borrar(_id)
+      .then(async (response: any) => {
+        if (!response.ok) throw new Error("Expediente con factura");
+        new ExpedientesService().getAll().then(async (response) => {
+          setExpedientes(await response.json());
+          setOpenSuccess(true);
+          setMessageSuccess("Borrado con éxito");
+        });
+      })
+      .catch((err: any) => {
+        setOpenWarning(true);
+        setMessageWarning("" + err);
+      });
+  };
   const columns: GridColDef[] = [
     { field: "numero_expediente", headerName: "Número Expediente", width: 150 },
     {
@@ -99,6 +124,21 @@ export default function Expedientes() {
       },
       width: 150,
     },
+    {
+      field: "eliminar",
+      renderCell: (params) => {
+        return (
+          <Button
+            color="error"
+            onClick={(e) => deleteExpediente(e, params.row._id)}
+          >
+            Borrar
+          </Button>
+        );
+      },
+      headerName: "Eliminar",
+      width: 150,
+    },
   ];
   const handleRowClick: GridEventListener<"rowClick"> = (params) => {
     router.push(`/expedientes/${params.id}/`);
@@ -120,7 +160,7 @@ export default function Expedientes() {
   };
   const checkUntil = (value: GridValidRowModel) => {
     if (fechaFin === null) return true;
-    if (DateTime.fromISO(value.fecha).diff(fechaFin).valueOf() >= 0)
+    if (DateTime.fromISO(value.fecha).diff(fechaFin).valueOf() > 0)
       return false;
     return true;
   };

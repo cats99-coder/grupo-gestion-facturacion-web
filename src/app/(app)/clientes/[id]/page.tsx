@@ -257,17 +257,6 @@ export default function BasicTabs() {
           className="col-span-1"
           size="small"
           onChange={handleCliente}
-          name="numero_cuenta"
-          value={cliente.numero_cuenta}
-          id="numero_cuenta"
-          label="Número Cuenta"
-          variant="outlined"
-          autoComplete="off"
-        />
-        <TextField
-          className="col-span-1"
-          size="small"
-          onChange={handleCliente}
           name="telefono"
           value={cliente.telefono}
           id="telefono"
@@ -316,6 +305,17 @@ export default function BasicTabs() {
           value={cliente.pais}
           id="pais"
           label="País"
+          variant="outlined"
+          autoComplete="off"
+        />
+        <TextField
+          className="col-span-1"
+          size="small"
+          onChange={handleCliente}
+          name="numero_cuenta"
+          value={cliente.numero_cuenta}
+          id="numero_cuenta"
+          label="Número Cuenta"
           variant="outlined"
           autoComplete="off"
         />

@@ -21,4 +21,14 @@ export class Service {
       body: JSON.stringify(body),
     });
   }
+  async delete(url: string, body: object = {}) {
+    return await fetch(this.URL + url, {
+      method: "DELETE",
+      headers: {
+        authorization: `Bearer ${Cookies.get("token")}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  }
 }

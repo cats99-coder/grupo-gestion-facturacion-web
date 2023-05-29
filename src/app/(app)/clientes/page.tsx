@@ -17,13 +17,21 @@ export default function Clientes() {
       setClientes(await response.json());
     });
   }, []);
-  console.log(clientes)
+  console.log(clientes);
   const router = useRouter();
   const columns: GridColDef[] = [
     { field: "NIF", headerName: "NIF", width: 150 },
-    { field: "nombreCompleto", headerName: "Nombre / Razón Social", width: 400},
+    {
+      field: "nombreCompleto",
+      headerName: "Nombre / Razón Social",
+      width: 400,
+    },
     { field: "telefono", headerName: "Teléfono", width: 150 },
     { field: "email", headerName: "Email", width: 150 },
+    { field: "codigo_postal", headerName: "Código Postal", width: 150 },
+    { field: "localidad", headerName: "Localidad", width: 150 },
+    { field: "provincia", headerName: "Provincia", width: 150 },
+    { field: "pais", headerName: "País", width: 150 },
     { field: "numero_cuenta", headerName: "Número Cuenta", width: 150 },
   ];
   const handleRowClick: GridEventListener<"rowClick"> = (params) => {
@@ -33,7 +41,7 @@ export default function Clientes() {
     router.push(`/clientes/nuevo/`);
   };
   return (
-    <div className="grid grid-rows-[min-content_minmax(0,1fr)] gap-y-2 h-full">
+    <div className="grid grid-cols-1 grid-rows-[min-content_minmax(0,1fr)] gap-y-2 h-full">
       <div className="flex justify-between items-center">
         <h1 className="">Clientes</h1>
         <div className="flex items-center">
@@ -41,6 +49,7 @@ export default function Clientes() {
         </div>
       </div>
       <DataGrid
+        className="w-full"
         getRowId={(row) => row._id}
         disableRowSelectionOnClick={true}
         onRowClick={handleRowClick}
