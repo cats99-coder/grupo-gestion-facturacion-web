@@ -55,7 +55,7 @@ export default function Perfil() {
         onClick={handleClick}
       >
         <Avatar sx={{ bgcolor: deepPurple[500] }}>
-          {user.nombre.substring(0, 1)}
+          {user.nombre?.substring(0, 1)}
         </Avatar>
         <p className="ml-3 text-white font-bold">{user.nombre}</p>
       </Button>
