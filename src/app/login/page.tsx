@@ -24,9 +24,10 @@ export default function Login() {
         if (!response.ok) throw new Error("Error login");
         const res = await response.json();
         Cookies.set("token", res.access_token);
+        Cookies.set("hola", "hola");
         router.push("/expedientes");
       })
-      .catch((err) => {});  
+      .catch((err) => {});
   };
   return (
     <div className="shadow-md rounded-md px-3 py-2 space-y-3 flex flex-col">

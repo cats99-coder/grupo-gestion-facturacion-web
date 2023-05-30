@@ -37,7 +37,6 @@ export default function Expedientes() {
   } = useContext<any>(ToastContext);
   const router = useRouter();
   const deleteExpediente = (e: any, _id: string) => {
-    console.log("Eliminar");
     e.stopPropagation();
     new ExpedientesService()
       .borrar(_id)

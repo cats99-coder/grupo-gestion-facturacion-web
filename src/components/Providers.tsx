@@ -2,6 +2,8 @@
 import { esES } from "@mui/x-data-grid";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
+import * as Jose from "jose";
+
 import { ReactNode, useState, Suspense, createContext } from "react";
 import {
   Alert,
@@ -10,18 +12,13 @@ import {
   createTheme,
   ThemeProvider,
 } from "@mui/material";
-import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
+import { cookies } from "next/headers";
+import Cookies from "js-cookie";
 
 export const ToastContext = createContext({});
 export const AuthContext = createContext({});
 
-export default function Providers({
-  children,
-  token,
-}: {
-  children: ReactNode;
-  token: {} | undefined;
-}) {
+export default function Providers({ children }: { children: ReactNode }) {
   const theme = createTheme(
     {
       palette: {
@@ -35,8 +32,10 @@ export default function Providers({
   const [openSuccess, setOpenSuccess] = useState(false);
   const [messageSuccess, setMessageSuccess] = useState("");
   const [user, setUser] = useState(() => {
+    let token = Cookies.get('token')
     if (token) {
-      return token;
+      const tokenDecoded = Jose.decodeJwt(token);
+      return tokenDecoded;
     } else {
       return {};
     }
