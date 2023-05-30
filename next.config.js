@@ -19,17 +19,6 @@ const nextConfig = () => {
       ];
     },
     rewrites,
-    headers: () => [
-      {
-        source: "/:path*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "no-cache",
-          },
-        ],
-      },
-    ],
     experimental: {
       appDir: true,
     },
