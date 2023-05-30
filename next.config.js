@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = () => {
-
   const rewrites = () => {
     return [
       {
@@ -13,13 +12,24 @@ const nextConfig = () => {
     async redirects() {
       return [
         {
-          source: '/',
-          destination: '/expedientes',
+          source: "/",
+          destination: "/expedientes",
           permanent: true,
         },
       ];
     },
     rewrites,
+    headers: () => [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-store",
+          },
+        ],
+      },
+    ],
     experimental: {
       appDir: true,
     },
