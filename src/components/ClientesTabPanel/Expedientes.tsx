@@ -14,6 +14,7 @@ export default function Expedientes({ _id }: { _id: string }) {
       try {
         if (!response.ok) throw new Error("error en petición");
         const res = await response.json();
+        console.log(res)
         setExpedientes(res);
       } catch (error) {}
     });
