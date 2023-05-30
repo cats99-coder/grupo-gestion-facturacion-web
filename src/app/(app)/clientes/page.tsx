@@ -7,7 +7,7 @@ import {
 } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@mui/material";
+import { Autocomplete, Button, TextField } from "@mui/material";
 import { ClientesService } from "@/services/clientes.service";
 
 export default function Clientes() {
@@ -37,13 +37,32 @@ export default function Clientes() {
   const handleRowClick: GridEventListener<"rowClick"> = (params) => {
     router.push(`/clientes/${params.id}/`);
   };
+  const [clientesSelecionados, setClientesSeleccionados] = useState([]);
   const handleNuevo = () => {
     router.push(`/clientes/nuevo/`);
   };
   return (
     <div className="grid grid-cols-1 grid-rows-[min-content_minmax(0,1fr)] gap-y-2 h-full">
       <div className="flex justify-between items-center">
-        <h1 className="">Clientes</h1>
+        <div className="flex items-center">
+          <h1 className="">Clientes</h1>
+          <Autocomplete
+            multiple={true}
+            options={clientes}
+            className="col-span-3"
+            size="small"
+            sx={{ width: 300 }}
+            value={clientesSelecionados}
+            isOptionEqualToValue={(option, value) => {
+              return option._id === value._id;
+            }}
+            getOptionLabel={(value) => {
+              return value.nombreCompleto;
+            }}
+            onChange={(e, value) => setClientesSeleccionados(value)}
+            renderInput={(params) => <TextField {...params} label="Clientes" />}
+          />
+        </div>
         <div className="flex items-center">
           <Button onClick={handleNuevo}>Nuevo</Button>
         </div>
@@ -54,7 +73,17 @@ export default function Clientes() {
         disableRowSelectionOnClick={true}
         onRowClick={handleRowClick}
         checkboxSelection
-        rows={clientes}
+        rows={clientes.filter((cliente: any) => {
+          if (clientesSelecionados.length === 0) {
+            return true;
+          }
+          return (
+            -1 !==
+            clientesSelecionados.findIndex((value: any) => {
+              return cliente?._id === value._id;
+            })
+          );
+        })}
         columns={columns}
       />
     </div>
