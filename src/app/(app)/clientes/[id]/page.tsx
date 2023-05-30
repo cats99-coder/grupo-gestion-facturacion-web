@@ -87,6 +87,7 @@ export default function BasicTabs() {
     numero_cuenta: "",
     email: "",
     codigo_postal: "",
+    calle: "",
     localidad: "",
     telefono: "",
     provincia: "",
@@ -269,10 +270,10 @@ export default function BasicTabs() {
           className="col-span-1"
           size="small"
           onChange={handleCliente}
-          name="calle"
-          value={cliente.calle}
-          id="calle"
-          label="Calle"
+          name="codigo_postal"
+          value={cliente.codigo_postal}
+          id="codigo_postal"
+          label="Código Postal"
           variant="outlined"
           autoComplete="off"
         />
@@ -280,10 +281,10 @@ export default function BasicTabs() {
           className="col-span-1"
           size="small"
           onChange={handleCliente}
-          name="codigo_postal"
-          value={cliente.codigo_postal}
-          id="codigo_postal"
-          label="Código Postal"
+          name="calle"
+          value={cliente.calle}
+          id="calle"
+          label="Calle"
           variant="outlined"
           autoComplete="off"
         />
