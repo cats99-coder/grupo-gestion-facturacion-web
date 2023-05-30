@@ -20,4 +20,10 @@ export class UsuariosService extends Service {
   async update(_id: string, cliente: Usuario) {
     return await this.post(`/usuarios/${_id}`, cliente);
   }
+  async changePassword(oldPassword: string, newPassword: string) {
+    return await this.post("/usuarios/changePassword", {
+      oldPassword,
+      newPassword,
+    });
+  }
 }
