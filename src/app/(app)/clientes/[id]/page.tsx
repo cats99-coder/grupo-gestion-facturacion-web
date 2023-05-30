@@ -60,6 +60,7 @@ export default function BasicTabs() {
     telefono: string;
     email: string;
     codigo_postal: string;
+    calle: string;
     localidad: string;
     provincia: string;
     pais: string;
@@ -261,6 +262,17 @@ export default function BasicTabs() {
           value={cliente.telefono}
           id="telefono"
           label="Teléfono"
+          variant="outlined"
+          autoComplete="off"
+        />
+        <TextField
+          className="col-span-1"
+          size="small"
+          onChange={handleCliente}
+          name="calle"
+          value={cliente.calle}
+          id="calle"
+          label="Calle"
           variant="outlined"
           autoComplete="off"
         />
