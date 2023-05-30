@@ -23,4 +23,7 @@ export class ExpedientesService extends Service {
   async porFacturar() {
     return await this.post(`/expedientes/porFacturar`, {});
   }
+  async getColaboraciones(id: string) {
+    return await this.post(`/expedientes/colaboraciones`, { usuario: id });
+  }
 }

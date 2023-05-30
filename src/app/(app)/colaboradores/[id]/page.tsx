@@ -1,22 +1,19 @@
 "use client";
 import * as React from "react";
+import { useState, useEffect } from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import Contactos from "@/components/ClientesTabPanel/Contactos";
-import Expedientes from "@/components/ClientesTabPanel/Expedientes";
-import { Button, Checkbox, FormControlLabel } from "@mui/material";
+import { Button } from "@mui/material";
 import { ClientesService } from "@/services/clientes.service";
-import Facturas from "@/components/ClientesTabPanel/Facturas";
 import { AuthContext, ToastContext } from "@/components/Providers";
 import { useContext } from "react";
-import Documentos from "@/components/ClientesTabPanel/Documentos";
-import ToggleButton from "@mui/material/ToggleButton";
-import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { UsuariosService } from "@/services/usuarios.service";
 import { ColaboradoresService } from "@/services/colaboradores.service";
+import { ExpedientesService } from "@/services/expedientes.service";
+import { price } from "@/utils/Format";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -25,7 +22,7 @@ interface TabPanelProps {
 }
 
 function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props
+  const { children, value, index, ...other } = props;
   return (
     <div
       role="tabpanel"
@@ -56,6 +53,7 @@ export default function BasicTabs() {
     nombre: "",
     apellido1: "",
     tipo: "PERSONA",
+    nombreCompleto: "",
     apellido2: "",
     numero_cuenta: "",
     email: "",
@@ -76,7 +74,7 @@ export default function BasicTabs() {
       if (externo === null) {
         router.push("/colaboradores");
       }
-      if (externo==='false') {
+      if (externo === "false") {
         new UsuariosService().getById(id).then(async (response) => {
           const res: Cliente = await response.json();
           setCliente(res);
@@ -92,9 +90,6 @@ export default function BasicTabs() {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
   };
-  const handleContactos = (contactos) => {
-    setCliente({ ...cliente, contactos });
-  };
   const handleCliente = (
     e: React.ChangeEvent<HTMLInputElement>,
     name?: string
@@ -107,12 +102,6 @@ export default function BasicTabs() {
   };
   const { setOpenSuccess, setMessageSuccess } =
     React.useContext<any>(ToastContext);
-  const handleTipo = (
-    event: React.MouseEvent<HTMLElement>,
-    newAlignment: string | null
-  ) => {
-    setCliente({ ...cliente, tipo: newAlignment });
-  };
 
   const saveClient = () => {
     if (id !== "nuevo") {
@@ -131,6 +120,26 @@ export default function BasicTabs() {
     }
   };
   const { user } = useContext<any>(AuthContext);
+  const [colaboraciones, setColaboraciones] = useState([]);
+  useEffect(() => {
+    if (externo === "false") {
+      new ExpedientesService().getColaboraciones(id).then(async (response) => {
+        setColaboraciones(await response.json());
+      });
+    }
+  }, []);
+  console.log(colaboraciones);
+  const columns: GridColDef[] = [
+    { field: "expediente", headerName: "Número de Expediente", width: 300 },
+    {
+      field: "importe",
+      headerName: "Importe",
+      width: 300,
+      valueGetter: (params)=> {
+        return price(params.row.importe);
+      },
+    },
+  ];
   return (
     <section className="h-full grid grid-rows-[min-content_min-content_minmax(0,1fr)] gap-y-2">
       <div className="flex justify-end items-center">
@@ -140,40 +149,7 @@ export default function BasicTabs() {
       </div>
       {/* FORMULARIO -------------------------------------------- */}
       <div className="grid grid-cols-6 gap-3 grid-rows-1">
-        <TextField
-          className="col-span-1"
-          size="small"
-          onChange={handleCliente}
-          name="nombre"
-          value={cliente.nombre}
-          id="nombre"
-          label="Nombre"
-          variant="outlined"
-          autoComplete="off"
-        />
-        <TextField
-          className="col-span-2"
-          type="email"
-          size="small"
-          onChange={handleCliente}
-          name="email"
-          value={cliente.email}
-          id="email"
-          label="email"
-          variant="outlined"
-          autoComplete="off"
-        />
-        <TextField
-          className="col-span-1"
-          size="small"
-          onChange={handleCliente}
-          name="numero_cuenta"
-          value={cliente.numero_cuenta}
-          id="numero_cuenta"
-          label="Número Cuenta"
-          variant="outlined"
-          autoComplete="off"
-        />
+        <div>{cliente.nombre}</div>
       </div>
       {/* TAB -------------------------------------------- */}
       {id !== "nuevo" && (
@@ -191,21 +167,25 @@ export default function BasicTabs() {
               onChange={handleChange}
               aria-label="basic tabs example"
             >
-              <Tab label="Todos" {...a11yProps(0)} />
-              {/* <Tab label="Expedientes" {...a11yProps(1)} />
-              <Tab label="Facturas" {...a11yProps(2)} />
-              <Tab label="Estadísticas" {...a11yProps(3)} /> */}
+              {colaboraciones.map((colaboracion: any, index) => {
+                return <Tab label={colaboracion.tipo} {...a11yProps(index)} />;
+              })}
             </Tabs>
           </Box>
-          <TabPanel value={tab} index={0}>
-
-          </TabPanel>
-          {/* <TabPanel value={tab} index={1}>
-            <Expedientes _id={cliente._id} />
-          </TabPanel>
-          <TabPanel value={tab} index={2}>
-            <Facturas _id={cliente._id} />
-          </TabPanel> */}
+          {colaboraciones.map((colaboracion: any, index) => {
+            return (
+              <TabPanel key={colaboracion.tipo} value={tab} index={index}>
+                <DataGrid
+                  className="w-full"
+                  getRowId={(row) => `${row.expediente}`}
+                  disableRowSelectionOnClick={true}
+                  checkboxSelection
+                  rows={colaboracion.deudas}
+                  columns={columns}
+                />
+              </TabPanel>
+            );
+          })}
         </Box>
       )}
     </section>

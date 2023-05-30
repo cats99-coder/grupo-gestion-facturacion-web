@@ -24,7 +24,7 @@ export default function Login() {
         if (!response.ok) throw new Error("Error login");
         const res = await response.json();
         Cookies.set("token", res.access_token);
-        router.replace("/");
+        router.push("/expedientes");
       })
       .catch((err) => {});  
   };

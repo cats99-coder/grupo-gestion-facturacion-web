@@ -49,6 +49,7 @@ export default function Perfil() {
           "aria-labelledby": "basic-button",
         }}
       >
+        <MenuItem onClick={()=>router.push('/estadisticas')}>Ver Estadísticas</MenuItem>
         <MenuItem onClick={logout}>Cerrar Sesión</MenuItem>
       </Menu>
     </div>

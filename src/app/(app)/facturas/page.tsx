@@ -19,7 +19,6 @@ export default function Facturas() {
   const [facturas, setFacturas] = useState<GridRowsProp>([]);
   useEffect(() => {
     new FacturasService().getAll().then(async (response) => {
-      console.log(response.ok);
       setFacturas(await response.json());
     });
   }, []);
