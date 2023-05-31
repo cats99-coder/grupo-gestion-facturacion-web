@@ -14,10 +14,12 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { deepPurple } from "@mui/material/colors";
 import { UsuariosService } from "@/services/usuarios.service";
+import { ConfiguracionService } from "@/services/configuracion.service";
 
 export default function Perfil() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [openChange, setOpenChange] = React.useState(false);
+  const [openConfiguracion, setOpenConfiguracion] = React.useState(false);
   const { user } = useContext<any>(AuthContext);
   const router = useRouter();
   const open = Boolean(anchorEl);
@@ -35,6 +37,15 @@ export default function Perfil() {
       setOpenChange(false);
     });
   };
+  const [configuracion, setConfiguracion] = React.useState({
+    RETENCION: 0,
+  });
+  const handleConfiguracion = (e: any) => {
+    setConfiguracion({ ...configuracion, [e.target.name]: e.target.value });
+  };
+  const handleCloseConfiguracion = () => {
+    setOpenConfiguracion(false);
+  };
   const [oldPassword, setOldPassword] = React.useState("");
   const [newPassword, setNewPassword] = React.useState("");
   const handleCloseChange = () => {
@@ -45,7 +56,17 @@ export default function Perfil() {
     handleClose();
     router.push("/login");
   };
-
+  React.useEffect(() => {
+    new ConfiguracionService().getAll().then(async (response) => {
+      if (!response.ok) throw new Error("Error");
+      const res = await response.json();
+      res.RETENCION = Number(res.RETENCION);
+      setConfiguracion(res);
+    });
+  }, []);
+  const updateConfig = () => {
+    new ConfiguracionService().update(configuracion).then();
+  };
   return (
     <div>
       <Button
@@ -73,8 +94,41 @@ export default function Perfil() {
         <MenuItem onClick={() => handleClickOpenChange()}>
           Cambiar Contraseña
         </MenuItem>
+        <MenuItem onClick={() => setOpenConfiguracion(true)}>
+          Configuración General
+        </MenuItem>
         <MenuItem onClick={logout}>Cerrar Sesión</MenuItem>
       </Menu>
+      {/* Configuracion */}
+      <Dialog
+        open={openConfiguracion}
+        onClose={handleCloseConfiguracion}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Configuración General</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="retencion"
+            name="RETENCION"
+            label="(%) Retención"
+            type="number"
+            fullWidth
+            value={configuracion.RETENCION}
+            onChange={(e) => handleConfiguracion(e)}
+            variant="outlined"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseConfiguracion}>Cancelar</Button>
+          <Button onClick={updateConfig} autoFocus>
+            Guardar
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* Cambio de contraseña */}
       <Dialog
         open={openChange}
         onClose={handleClose}
