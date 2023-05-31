@@ -56,7 +56,7 @@ export default function Perfil() {
         onClick={handleClick}
       >
         <Avatar sx={{ bgcolor: deepPurple[500] }}></Avatar>
-        <p className="ml-3 text-white font-bold">{user.nombre}</p>
+        <p className="ml-3 text-white font-bold">{}</p>
       </Button>
       <Menu
         id="basic-menu"

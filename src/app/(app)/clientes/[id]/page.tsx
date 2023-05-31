@@ -100,6 +100,7 @@ export default function BasicTabs() {
     if (id !== "nuevo") {
       new ClientesService().getById(id).then(async (response) => {
         const res: Cliente = await response.json();
+        console.log(res);
         setCliente(res);
       });
     }

@@ -5,8 +5,10 @@ import {
   GridColDef,
   GridEventListener,
   GridValidRowModel,
+  GridToolbarContainer,
+  GridColumnHeaderParams,
 } from "@mui/x-data-grid";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Autocomplete, Button, TextField } from "@mui/material";
 import { ExpedientesService } from "@/services/expedientes.service";
@@ -53,6 +55,7 @@ export default function Expedientes() {
         setMessageWarning("" + err);
       });
   };
+
   const columns: GridColDef[] = [
     { field: "numero_expediente", headerName: "Número Expediente", width: 150 },
     {
@@ -79,6 +82,17 @@ export default function Expedientes() {
     {
       field: "importe",
       headerName: "Importe",
+      renderHeader: (params: GridColumnHeaderParams) => {
+        const total = expedientesFiltrados.reduce((prev: any, current: any) => {
+          return prev + current.importe;
+        }, 0);
+        return (
+          <div className="flex flex-col leading-4">
+            <span>{price(total)}</span>
+            <span>Importe</span>
+          </div>
+        );
+      },
       valueGetter(params) {
         return price(params.row.importe);
       },
@@ -87,6 +101,22 @@ export default function Expedientes() {
     {
       field: "suplidos",
       headerName: "Suplidos",
+      renderHeader: (params: GridColumnHeaderParams) => {
+        const total = expedientesFiltrados.reduce((prev: any, current: any) => {
+          return (
+            prev +
+            current.suplidos.reduce((prev: any, current: any) => {
+              return prev + current.importe;
+            }, 0)
+          );
+        }, 0);
+        return (
+          <div className="flex flex-col leading-4">
+            <span>{price(total)}</span>
+            <span>Suplidos</span>
+          </div>
+        );
+      },
       width: 150,
       valueGetter(params) {
         const total = params.row.suplidos.reduce(
@@ -163,6 +193,28 @@ export default function Expedientes() {
       return false;
     return true;
   };
+  const expedientesFiltrados = useMemo(() => {
+    return expedientes
+      .filter((expediente) => {
+        if (tipo.length === 0) {
+          return true;
+        }
+        return tipo.includes(expediente.tipo);
+      })
+      .filter((expediente) => {
+        if (cliente.length === 0) {
+          return true;
+        }
+        return (
+          -1 !==
+          cliente.findIndex((value) => {
+            return expediente.cliente?._id === value._id;
+          })
+        );
+      })
+      .filter(checkFrom)
+      .filter(checkUntil);
+  }, [expedientes, tipo, cliente, fechaFin, fechaInicio]);
   return (
     <div className="grid grid-cols-1 grid-rows-[min-content_minmax(0,1fr)] gap-y-2 h-full">
       <div className="flex justify-between items-center">
@@ -217,26 +269,7 @@ export default function Expedientes() {
         disableRowSelectionOnClick={true}
         onRowClick={handleRowClick}
         checkboxSelection
-        rows={expedientes
-          .filter((expediente) => {
-            if (tipo.length === 0) {
-              return true;
-            }
-            return tipo.includes(expediente.tipo);
-          })
-          .filter((expediente) => {
-            if (cliente.length === 0) {
-              return true;
-            }
-            return (
-              -1 !==
-              cliente.findIndex((value) => {
-                return expediente.cliente?._id === value._id;
-              })
-            );
-          })
-          .filter(checkFrom)
-          .filter(checkUntil)}
+        rows={expedientesFiltrados}
         columns={columns}
       />
     </div>
