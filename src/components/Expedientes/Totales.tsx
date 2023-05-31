@@ -53,11 +53,17 @@ export const totales = (expediente: Expediente): Total => {
     const suplidos = expediente.suplidos.reduce((suma, suplido) => {
       return suma + suplido.importe;
     }, 0);
+    const colaboradores = expediente.colaboradores.reduce(
+      (suma, colaborador: any) => {
+        return suma + colaborador.importe;
+      },
+      0
+    );
     const cobros = expediente.cobros.reduce((suma, cobro) => {
       return suma + cobro.importe;
     }, 0);
-    const base = Number(expediente.importe);
-    const IVA = Number(expediente.importe) * (Number(expediente.IVA) / 100);
+    const base = Number(expediente.importe) + Number(colaboradores);
+    const IVA = base * (Number(expediente.IVA) / 100);
     const total = base + IVA + Number(suplidos);
     const pendiente = total - cobros - expediente.provisiones;
     return {
