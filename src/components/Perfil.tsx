@@ -1,6 +1,6 @@
 "use client";
 import { useContext } from "react";
-import { AuthContext } from "./Providers";
+import { AuthContext, ToastContext } from "./Providers";
 import * as React from "react";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -21,6 +21,7 @@ export default function Perfil() {
   const [openChange, setOpenChange] = React.useState(false);
   const [openConfiguracion, setOpenConfiguracion] = React.useState(false);
   const { user } = useContext<any>(AuthContext);
+  const [setOpenSuccess, setMessageSuccess] = useContext(ToastContext);
   const router = useRouter();
   const open = Boolean(anchorEl);
   const handleClose = () => {
@@ -61,12 +62,16 @@ export default function Perfil() {
       if (!response.ok) throw new Error("Error");
       const res = await response.json();
       res.RETENCION = Number(res.RETENCION);
-      console.log(res)
       setConfiguracion(res);
     });
   }, []);
   const updateConfig = () => {
-    new ConfiguracionService().update(configuracion).then();
+    new ConfiguracionService().update(configuracion).then((response) => {
+      if (!response.ok) throw new Error("Configuración Fallida");
+      setOpenSuccess(true);
+      setMessageSuccess("Configuración Correcta");
+      setOpenConfiguracion(false);
+    });
   };
   return (
     <div>
