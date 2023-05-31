@@ -61,6 +61,7 @@ export default function Perfil() {
       if (!response.ok) throw new Error("Error");
       const res = await response.json();
       res.RETENCION = Number(res.RETENCION);
+      console.log(res)
       setConfiguracion(res);
     });
   }, []);
