@@ -21,7 +21,7 @@ export default function Perfil() {
   const [openChange, setOpenChange] = React.useState(false);
   const [openConfiguracion, setOpenConfiguracion] = React.useState(false);
   const { user } = useContext<any>(AuthContext);
-  const [setOpenSuccess, setMessageSuccess] = useContext(ToastContext);
+  const { setOpenSuccess, setMessageSuccess } = useContext<any>(ToastContext);
   const router = useRouter();
   const open = Boolean(anchorEl);
   const handleClose = () => {
