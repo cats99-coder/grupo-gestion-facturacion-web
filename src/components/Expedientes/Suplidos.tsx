@@ -118,6 +118,16 @@ export default function Suplidos({ initialRows, handleSuplidos, facturado }) {
   const columns: GridColDef[] = [
     { field: "concepto", headerName: "Concepto", flex: 0.7, editable: true },
     {
+      field: "fecha",
+      headerName: "Fecha",
+      flex: 0.3,
+      type: "date",
+      valueGetter: function (params) {
+        return new Date(params.row.fecha);
+      },
+      editable: true,
+    },
+    {
       field: "importe",
       headerName: "Importe",
       flex: 0.3,

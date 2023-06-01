@@ -27,6 +27,7 @@ import { TabPanel, a11yProps } from "@/utils/Tabs";
 import Colaboradores from "@/components/Expedientes/Colaboradores";
 import Cobros from "@/components/Expedientes/Cobros";
 import { DateToDoce } from "@/utils";
+import RealizarCobro from "@/components/Expedientes/RealizarCobro";
 
 export default function ExpedienteLayout({
   children,
@@ -138,7 +139,11 @@ export default function ExpedienteLayout({
     setValue(newValue);
   };
   const [openNew, setOpenNew] = React.useState(false);
+  const [openRealizarPago, setOpenReliazarPago] = React.useState(false);
   const [openEstados, setOpenEstados] = React.useState(false);
+  const handleRealizarPago = () => {
+    setOpenReliazarPago(false);
+  };
   const columns: GridColDef[] = [
     { field: "concepto", headerName: "Concepto", width: 300, editable: true },
     { field: "importe", headerName: "Importe", width: 150, editable: true },
@@ -171,9 +176,18 @@ export default function ExpedienteLayout({
             <Button onClick={goToInvoice}>Ver Factura</Button>
           </>
         )}
+        <Button onClick={() => setOpenReliazarPago(!openRealizarPago)}>
+          Realizar Cobro
+        </Button>
         <Button onClick={saveExpediente}>
           {id !== "nuevo" ? "Guardar" : "Crear"}
         </Button>
+        {openRealizarPago && (
+          <RealizarCobro
+            handleOpen={handleRealizarPago}
+            expediente={expediente}
+          />
+        )}
       </div>
       {/* FORMULARIO -------------------------------------------- */}
       <div className="grid grid-cols-6 gap-3 h-min">
@@ -299,7 +313,7 @@ export default function ExpedienteLayout({
           />
         </TabPanel>
         <TabPanel value={value} index={2}>
-          <Cobros initialRows={expediente.cobros} handleCobros={handleCobros} />
+          <Cobros initialRows={expediente.cobros} suplidos={expediente.suplidos} handleCobros={handleCobros} />
         </TabPanel>
       </Box>
       <Dialog open={openEstados} onClose={handleCloseEstados}>

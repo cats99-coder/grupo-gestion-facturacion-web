@@ -18,14 +18,18 @@ export default function Colaboradores() {
   useEffect(() => {
     new UsuariosService().getAll().then(async (response) => {
       const res = await response.json();
-      setColaboradores(
-        res.map((r: Usuario) => {
-          return { ...r, tipo: "usuario" };
-        })
-      );
-      //   new ColaboradoresService().getAll().then(async (response) => {
-      //     setColaboradores(await response.json());
-      //   });
+
+      new ColaboradoresService().getAll().then(async (response) => {
+        const res2 = await response.json();
+        setColaboradores([
+          ...res.map((r: Usuario) => {
+            return { ...r, tipo: "usuario" };
+          }),
+          ...res2.map((r: Colaborador) => {
+            return { ...r, tipo: "colaborador" };
+          }),
+        ]);
+      });
     });
   }, []);
   const router = useRouter();

@@ -40,7 +40,7 @@ function EditToolbar(props: EditToolbarProps) {
     const _id = ObjectId();
     setRows((oldRows) => [
       ...oldRows,
-      { _id, concepto: "", importe: 0, isNew: true },
+      { _id, tipo: "GENERAL", concepto: "", importe: 0, isNew: true },
     ]);
 
     setRowModesModel((oldModel) => ({
@@ -58,8 +58,18 @@ function EditToolbar(props: EditToolbarProps) {
   );
 }
 
-export default function Cobros({ initialRows, handleCobros }) {
-  const [rows, setRows] = React.useState(initialRows);
+export default function Cobros({ initialRows, handleCobros, suplidos }: any) {
+  const [rows, setRows] = React.useState(
+    initialRows.map((i: any) => {
+      if (i.suplidoRef) {
+        i.suplidoRef = suplidos.find((suplido: any) => {
+          console.log(i.suplidoRef, suplido._id);
+          return i.suplido === suplido._id;
+        });
+      }
+      return i;
+    })
+  );
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>(
     {}
   );
@@ -71,9 +81,9 @@ export default function Cobros({ initialRows, handleCobros }) {
       setColaboradores(res);
     });
   }, []);
-  React.useEffect(() => {
-    setRows(initialRows);
-  }, [initialRows]);
+  // React.useEffect(() => {
+  //   setRows(initialRows);
+  // }, []);
   React.useEffect(() => {
     handleCobros(rows);
   }, [rows]);
@@ -118,13 +128,13 @@ export default function Cobros({ initialRows, handleCobros }) {
     setRows(rows.map((row) => (row._id === newRow._id ? updatedRow : row)));
     return updatedRow;
   };
-  const handleTipo = (id: string, tipo: CobroType | null) => {
-    setRows(rows.map((row) => (row._id === id ? { ...row, tipo } : row)));
+  const handleTipo = (id: string, cobradoPor: CobroType | null) => {
+    setRows(rows.map((row) => (row._id === id ? { ...row, cobradoPor } : row)));
   };
-
   const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
     setRowModesModel(newRowModesModel);
   };
+  console.log(initialRows);
   const tipos: CobroType[] = ["BIZUM C", "EFECTIVO R"];
   const columns: GridColDef = [
     {
@@ -132,28 +142,44 @@ export default function Cobros({ initialRows, handleCobros }) {
       headerName: "Tipo",
       width: 350,
       renderCell(params) {
-        return (
-          <div className="p-2">
-            <Autocomplete
-              // disablePortal
-              id="combo-box-demo"
-              options={tipos}
-              value={params.row.tipo}
-              onChange={(e, value: CobroType | null) =>
-                handleTipo(params.id, value)
-              }
-              sx={{ width: 300 }}
-              renderInput={(params) => (
-                <TextField {...params} size="small" label="" />
-              )}
-            />
-          </div>
-        );
+        if (params.row.tipo === "GENERAL") {
+          return (
+            <div className="p-2">
+              <Autocomplete
+                // disablePortal
+                id="combo-box-demo"
+                options={tipos}
+                value={params.row?.cobradoPor}
+                onChange={(e, value: CobroType | null) =>
+                  handleTipo(params.id, value)
+                }
+                sx={{ width: 300 }}
+                renderInput={(params) => (
+                  <TextField {...params} size="small" label="" />
+                )}
+              />
+            </div>
+          );
+        }
+        if (params.row.tipo === "SUPLIDO") {
+          return `SUPLIDO: ${params.row.suplidoRef.concepto}`;
+        }
       },
+    },
+    {
+      field: "fecha",
+      headerName: "Fecha",
+      type: "date",
+      width: 150,
+      valueGetter: function(params) {
+        return new Date(params.row.fecha)
+      },
+      editable: true,
     },
     {
       field: "importe",
       headerName: "Importe",
+      type: "number",
       width: 150,
       editable: true,
     },

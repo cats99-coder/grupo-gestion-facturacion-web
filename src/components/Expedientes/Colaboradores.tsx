@@ -70,14 +70,14 @@ export default function Colaboradores({ initialRows, handleColaboradores }) {
   >([]);
   React.useEffect(() => {
     new UsuariosService().getAll().then(async (response) => {
-      const res: Array<Usuario | Colaborador> = await response.json();
-      setColaboradores(res);
+      const usuarios: Array<Usuario | Colaborador> = await response.json();
       new ColaboradoresService().getAll().then(async (response) => {
         const res: Array<Usuario | Colaborador> = await response.json();
-        setColaboradores([...colaboradores, ...res]);
+        setColaboradores([...usuarios, ...res]);
       });
     });
   }, []);
+  console.log(colaboradores);
   React.useEffect(() => {
     setRows(initialRows);
   }, [initialRows]);
