@@ -83,12 +83,9 @@ export default function Expedientes() {
       field: "importe",
       headerName: "Importe",
       renderHeader: (params: GridColumnHeaderParams) => {
-        const total = expedientesFiltrados.reduce((prev: any, current: any) => {
-          return prev + current.importe;
-        }, 0);
         return (
           <div className="flex flex-col leading-4">
-            <span>{price(total)}</span>
+            <span>{price((expedientesProcesados as any).importe)}</span>
             <span>Importe</span>
           </div>
         );
@@ -99,20 +96,36 @@ export default function Expedientes() {
       width: 150,
     },
     {
+      field: "IVA",
+      headerName: "IVA",
+      renderHeader: (params: GridColumnHeaderParams) => {
+        return (
+          <div className="flex flex-col leading-4">
+            <span>{price((expedientesProcesados as any).IVA)}</span>
+            <span>IVA</span>
+          </div>
+        );
+      },
+      width: 150,
+      valueGetter(params) {
+        const importe = params.row.importe;
+        const colaboradores = params.row.colaboradores.reduce(
+          (suma: number, colaborador: any) => {
+            return suma + Number(colaborador.importe);
+          },
+          0
+        );
+        const iva = (importe + colaboradores) * (params.row.IVA / 100);
+        return price(iva);
+      },
+    },
+    {
       field: "suplidos",
       headerName: "Suplidos",
       renderHeader: (params: GridColumnHeaderParams) => {
-        const total = expedientesFiltrados.reduce((prev: any, current: any) => {
-          return (
-            prev +
-            current.suplidos.reduce((prev: any, current: any) => {
-              return prev + current.importe;
-            }, 0)
-          );
-        }, 0);
         return (
           <div className="flex flex-col leading-4">
-            <span>{price(total)}</span>
+            <span>{price((expedientesProcesados as any).suplidos)}</span>
             <span>Suplidos</span>
           </div>
         );
@@ -131,6 +144,14 @@ export default function Expedientes() {
     {
       field: "colaboradores",
       headerName: "Colaboradores",
+      renderHeader: (params: GridColumnHeaderParams) => {
+        return (
+          <div className="flex flex-col leading-4">
+            <span>{price((expedientesProcesados as any).colaboradores)}</span>
+            <span>Colaboradores</span>
+          </div>
+        );
+      },
       valueGetter(params) {
         const total = params.row.colaboradores.reduce(
           (suma: number, colaborador: any) => {
@@ -145,6 +166,33 @@ export default function Expedientes() {
     {
       field: "cobros",
       headerName: "Cobrado",
+      renderHeader: (params: GridColumnHeaderParams) => {
+        return (
+          <div className="flex flex-col leading-4">
+            <span>{price((expedientesProcesados as any).cobrado)}</span>
+            <span>Cobrado</span>
+          </div>
+        );
+      },
+      valueGetter(params) {
+        const total = params.row.cobros.reduce((suma: number, cobro: any) => {
+          return suma + Number(cobro.importe);
+        }, 0);
+        return price(total);
+      },
+      width: 150,
+    },
+    {
+      field: "pendiente",
+      headerName: "Pendiente",
+      renderHeader: (params: GridColumnHeaderParams) => {
+        return (
+          <div className="flex flex-col leading-4">
+            <span>{price((expedientesProcesados as any).pendiente)}</span>
+            <span>Pendiente</span>
+          </div>
+        );
+      },
       valueGetter(params) {
         const total = params.row.cobros.reduce((suma: number, cobro: any) => {
           return suma + Number(cobro.importe);
@@ -193,8 +241,8 @@ export default function Expedientes() {
       return false;
     return true;
   };
-  const expedientesFiltrados = useMemo(() => {
-    return expedientes
+  const expedientesProcesados = useMemo(() => {
+    const expedientesFiltrados = expedientes
       .filter((expediente) => {
         if (tipo.length === 0) {
           return true;
@@ -214,6 +262,52 @@ export default function Expedientes() {
       })
       .filter(checkFrom)
       .filter(checkUntil);
+    const totales: any = expedientesFiltrados.reduce(
+      (prev, current) => {
+        const e = {
+          importe: prev.importe + current.importe,
+          suplidos:
+            prev.suplidos +
+            current.suplidos.reduce((suma: number, suplido: any) => {
+              return suma + Number(suplido.importe);
+            }, 0),
+          colaboradores:
+            prev.colaboradores +
+            current.colaboradores.reduce((suma: number, colaborador: any) => {
+              return suma + Number(colaborador.importe);
+            }, 0),
+          cobrado:
+            prev.cobrado +
+            current.cobros.reduce((suma: number, cobro: any) => {
+              return suma + Number(cobro.importe);
+            }, 0),
+        };
+        const IVA =
+          prev.IVA +
+          (current.importe +
+            current.colaboradores.reduce((suma: number, colaborador: any) => {
+              return suma + Number(colaborador.importe);
+            }, 0)) *
+            (current.IVA / 100);
+        return { ...e, IVA };
+      },
+      {
+        importe: 0,
+        suplidos: 0,
+        colaboradores: 0,
+        IVA: 0,
+        total: 0,
+        cobrado: 0,
+        pendiente: 0,
+      }
+    );
+    const pendiente: number =
+      totales.importe +
+      totales.IVA +
+      totales.suplidos +
+      totales.colaboradores -
+      totales.cobrado;
+    return { expedientesFiltrados, ...totales, pendiente };
   }, [expedientes, tipo, cliente, fechaFin, fechaInicio]);
   return (
     <div className="grid grid-cols-1 grid-rows-[min-content_minmax(0,1fr)] gap-y-2 h-full">
@@ -269,7 +363,7 @@ export default function Expedientes() {
         disableRowSelectionOnClick={true}
         onRowClick={handleRowClick}
         checkboxSelection
-        rows={expedientesFiltrados}
+        rows={expedientesProcesados.expedientesFiltrados}
         columns={columns}
       />
     </div>

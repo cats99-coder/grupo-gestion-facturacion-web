@@ -22,6 +22,7 @@ import {
 } from "@mui/x-data-grid";
 import { Autocomplete, TextField } from "@mui/material";
 import { UsuariosService } from "@/services/usuarios.service";
+import { ColaboradoresService } from "@/services/colaboradores.service";
 
 const ObjectId = (rnd = (r16) => Math.floor(r16).toString(16)) =>
   rnd(Date.now() / 1000) +
@@ -71,6 +72,10 @@ export default function Colaboradores({ initialRows, handleColaboradores }) {
     new UsuariosService().getAll().then(async (response) => {
       const res: Array<Usuario | Colaborador> = await response.json();
       setColaboradores(res);
+      new ColaboradoresService().getAll().then(async (response) => {
+        const res: Array<Usuario | Colaborador> = await response.json();
+        setColaboradores([...colaboradores, ...res]);
+      });
     });
   }, []);
   React.useEffect(() => {
@@ -122,7 +127,9 @@ export default function Colaboradores({ initialRows, handleColaboradores }) {
   };
   const handleColaborador = (id: string, colaborador: Colaborador | null) => {
     setRows(
-      rows.map((row) => (row._id === id ? { ...row, usuario: colaborador } : row))
+      rows.map((row) =>
+        row._id === id ? { ...row, usuario: colaborador } : row
+      )
     );
   };
 
