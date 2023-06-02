@@ -79,8 +79,20 @@ export default function Colaboradores({ initialRows, handleColaboradores }) {
   }, []);
   console.log(colaboradores);
   React.useEffect(() => {
-    setRows(initialRows);
-  }, [initialRows]);
+    if (colaboradores.length !== 0) {
+      setRows(
+        initialRows.map((value: any) => {
+          const c = colaboradores.find((c) => {
+            console.log(c, value);
+            console.log(c._id === value.usuario);
+            return c._id === value.usuario;
+          });
+          value.usuario = c;
+          return value;
+        })
+      );
+    }
+  }, [colaboradores]);
   React.useEffect(() => {
     handleColaboradores(rows);
   }, [rows]);
@@ -136,6 +148,7 @@ export default function Colaboradores({ initialRows, handleColaboradores }) {
   const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
     setRowModesModel(newRowModesModel);
   };
+  console.log(rows);
   const columns: GridColDef = [
     {
       field: "usuario",
@@ -146,7 +159,9 @@ export default function Colaboradores({ initialRows, handleColaboradores }) {
           <div className="p-2">
             <Autocomplete
               isOptionEqualToValue={(option, value) => {
-                return option._id === value._id;
+                console.log(option._id, value);
+                console.log(option._id === value);
+                return option._id === value;
               }}
               id="combo-box-demo"
               options={colaboradores}
@@ -155,6 +170,7 @@ export default function Colaboradores({ initialRows, handleColaboradores }) {
                 handleColaborador(params.id, value)
               }
               getOptionLabel={(params) => {
+                console.log(params);
                 return params.nombre;
               }}
               sx={{ width: 300 }}
@@ -215,7 +231,6 @@ export default function Colaboradores({ initialRows, handleColaboradores }) {
       },
     },
   ];
-
   return (
     <Box
       sx={{
