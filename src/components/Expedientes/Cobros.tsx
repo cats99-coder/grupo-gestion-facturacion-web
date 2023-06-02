@@ -63,7 +63,6 @@ export default function Cobros({ initialRows, handleCobros, suplidos }: any) {
     initialRows.map((i: any) => {
       if (i.suplidoRef) {
         i.suplidoRef = suplidos.find((suplido: any) => {
-          console.log(i.suplidoRef, suplido._id);
           return i.suplido === suplido._id;
         });
       }
@@ -134,7 +133,6 @@ export default function Cobros({ initialRows, handleCobros, suplidos }: any) {
   const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
     setRowModesModel(newRowModesModel);
   };
-  console.log(initialRows);
   const tipos: CobroType[] = ["BIZUM C", "EFECTIVO R"];
   const columns: GridColDef = [
     {
@@ -162,7 +160,10 @@ export default function Cobros({ initialRows, handleCobros, suplidos }: any) {
           );
         }
         if (params.row.tipo === "SUPLIDO") {
-          return `SUPLIDO: ${params.row.suplidoRef.concepto}`;
+          if (params.row.suplidoRef) {
+            return `SUPLIDO: ${params.row.suplidoRef.concepto}`;
+          }
+          return <div className="bg-red-800 py-1 px-2 text-white">Error</div>;
         }
       },
     },
@@ -171,8 +172,8 @@ export default function Cobros({ initialRows, handleCobros, suplidos }: any) {
       headerName: "Fecha",
       type: "date",
       width: 150,
-      valueGetter: function(params) {
-        return new Date(params.row.fecha)
+      valueGetter: function (params) {
+        return new Date(params.row.fecha);
       },
       editable: true,
     },
