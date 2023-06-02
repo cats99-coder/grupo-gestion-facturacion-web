@@ -116,7 +116,7 @@ export default function Suplidos({ initialRows, handleSuplidos, facturado }) {
     setRowModesModel(newRowModesModel);
   };
   const columns: GridColDef[] = [
-    { field: "concepto", headerName: "Concepto", flex: 0.7, editable: true },
+    { field: "concepto", headerName: "Concepto", width: 350, editable: true },
     {
       field: "fecha",
       headerName: "Fecha",
@@ -130,6 +130,13 @@ export default function Suplidos({ initialRows, handleSuplidos, facturado }) {
     {
       field: "importe",
       headerName: "Importe",
+      flex: 0.3,
+      type: "number",
+      editable: true,
+    },
+    {
+      field: "pendiente",
+      headerName: "Pendiente",
       flex: 0.3,
       type: "number",
       editable: true,

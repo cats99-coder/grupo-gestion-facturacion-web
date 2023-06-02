@@ -81,9 +81,9 @@ export default function Cobros({ initialRows, handleCobros, suplidos }: any) {
       setColaboradores(res);
     });
   }, []);
-  // React.useEffect(() => {
-  //   setRows(initialRows);
-  // }, []);
+  React.useEffect(() => {
+    setRows(initialRows);
+  }, [initialRows]);
   React.useEffect(() => {
     handleCobros(rows);
   }, [rows]);

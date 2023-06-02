@@ -48,7 +48,7 @@ export default function Totales({ total }: { total: Total }) {
   );
 }
 
-export const totales = (expediente: Expediente): Total => {
+export const totales = (expediente: Expediente) => {
   return useMemo(() => {
     const suplidos = expediente.suplidos.reduce((suma, suplido) => {
       return suma + suplido.importe;
@@ -62,16 +62,49 @@ export const totales = (expediente: Expediente): Total => {
     const cobros = expediente.cobros.reduce((suma, cobro) => {
       return suma + cobro.importe;
     }, 0);
+    const cobrosPorTipo = expediente.cobros.reduce(
+      (cobros: any, cobro: any) => {
+        if (cobro.tipo === "SUPLIDO") {
+          cobros.suplido.push({
+            _id: cobro.suplido,
+            importe: cobro.importe,
+          });
+        }
+        if (cobro.tipo === "GENERAL") {
+          cobros.general += Number(cobro.importe || 0);
+        }
+        if (cobro.tipo === "PROVISION") {
+          cobros.provision += Number(cobro.importe || 0);
+        }
+        return cobros;
+      },
+      {
+        suplido: [],
+        provision: 0,
+        general: 0,
+      }
+    );
     const base = Number(expediente.importe) + Number(colaboradores);
     const IVA = base * (Number(expediente.IVA) / 100);
+    const restoSuplidos =
+      Number(suplidos) -
+      cobrosPorTipo.suplido.reduce((suma, suplido) => {
+        return suma + suplido.importe;
+      }, 0);
+    const restoIVA =
+      (base - cobrosPorTipo?.general) * (Number(expediente.IVA) / 100);
     const total = base + IVA + Number(suplidos);
     const pendiente = total - cobros - expediente.provisiones;
     return {
       base,
       suplidos,
       IVA,
+      restoIVA,
+      restoSuplidos,
       total,
       pendiente,
+      cobrosPorTipo,
+      colaboradores,
     };
   }, [expediente, expediente.suplidos, expediente.cobros]);
 };

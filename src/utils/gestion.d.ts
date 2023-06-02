@@ -36,11 +36,11 @@ interface Colaborador {
   _id: string;
   nombre: string;
 }
-type CobroType = "BIZUM C" | "EFECTIVO R";
 interface Cobro {
   _id: string;
-  tipo: CobroType;
+  tipo: string;
   importe;
+  suplido?: string;
 }
 interface Expediente {
   _id: string;

@@ -1,5 +1,6 @@
 "use client";
 import * as React from "react";
+import { useContext } from "react";
 import TextField from "@mui/material/TextField";
 import { useParams, useRouter } from "next/navigation";
 import { ExpedientesService } from "@/services/expedientes.service";
@@ -18,7 +19,7 @@ import {
   Tabs,
 } from "@mui/material";
 import { ClientesService } from "@/services/clientes.service";
-import { ToastContext } from "@/components/Providers";
+import { AuthContext, ToastContext } from "@/components/Providers";
 import { DateTime } from "luxon";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Suplidos from "@/components/Expedientes/Suplidos";
@@ -28,12 +29,14 @@ import Colaboradores from "@/components/Expedientes/Colaboradores";
 import Cobros from "@/components/Expedientes/Cobros";
 import { DateToDoce } from "@/utils";
 import RealizarCobro from "@/components/Expedientes/RealizarCobro";
+import objectId from "@/utils/ObjectId";
 
 export default function ExpedienteLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { user } = useContext(AuthContext);
   const [clientes, setClientes] = React.useState<Cliente[]>([]);
   const [facturado, setFacturado] = React.useState<boolean>(false);
   const [expediente, setExpediente] = React.useState<Expediente>({
@@ -48,7 +51,7 @@ export default function ExpedienteLayout({
     suplidos: [],
     colaboradores: [],
     cobros: [],
-    IVA: 0,
+    IVA: user.rol === "INMA" ? 21 : 0,
     factura: {
       _id: "",
       numero_factura: 0,
@@ -76,6 +79,67 @@ export default function ExpedienteLayout({
       ...expediente,
       cobros,
     });
+  };
+  const cobrar = (suplidos: any, pago: number) => {
+    setExpediente((value) => {
+      const cobros: any = [];
+      const fecha = new Date();
+      const pagoSuplido = suplidos.reduce((suma: number, suplido: any) => {
+        if (suplido.check) {
+          return suma + Number(suplido.aPagar || 0);
+        }
+        return suma;
+      }, 0);
+      if (pagoSuplido === 0) {
+        cobros.push({
+          tipo: "GENERAL",
+          concepto: "",
+          fecha,
+          importe: pago,
+          _id: objectId(),
+        });
+        return { ...value, cobros: [...value.cobros, ...cobros] };
+      }
+      if (pago - pagoSuplido > 0) {
+        const resto = pago - pagoSuplido;
+        suplidos.forEach((suplido) => {
+          if (suplido.check) {
+            cobros.push({
+              tipo: "SUPLIDO",
+              suplido: suplido._id,
+              fecha,
+              suplidoRef: suplido._id,
+              importe: suplido.aPagar,
+              _id: objectId(),
+            });
+            return { ...value, cobros: [...value.cobros, ...cobros] };
+          }
+        });
+        cobros.push({
+          tipo: "GENERAL",
+          concepto: "",
+          fecha,
+          importe: resto,
+          _id: objectId(),
+        });
+        return { ...value, cobros: [...value.cobros, ...cobros] };
+      }
+      suplidos.forEach((suplido) => {
+        if (suplido.check) {
+          cobros.push({
+            tipo: "SUPLIDO",
+            suplido: suplido._id,
+            suplidoRef: suplido._id,
+            fecha,
+            importe: suplido.aPagar,
+            _id: objectId(),
+          });
+        }
+      });
+      return { ...value, cobros: [...value.cobros, ...cobros] };
+    });
+    setValue(0);
+    setValue(2);
   };
   const { id } = useParams();
   React.useEffect(() => {
@@ -164,6 +228,7 @@ export default function ExpedienteLayout({
   const handleCloseEstados = () => {
     setOpenEstados(false);
   };
+
   return (
     <section className="h-full grid grid-rows-[min-content_min-content_minmax(0,1fr)] gap-y-2">
       <div className="flex justify-end items-center">
@@ -186,6 +251,7 @@ export default function ExpedienteLayout({
           <RealizarCobro
             handleOpen={handleRealizarPago}
             expediente={expediente}
+            cobrar={cobrar}
           />
         )}
       </div>
@@ -313,7 +379,13 @@ export default function ExpedienteLayout({
           />
         </TabPanel>
         <TabPanel value={value} index={2}>
-          <Cobros initialRows={expediente.cobros} suplidos={expediente.suplidos} handleCobros={handleCobros} />
+          {value === 2 && (
+            <Cobros
+              initialRows={expediente.cobros}
+              suplidos={expediente.suplidos}
+              handleCobros={handleCobros}
+            />
+          )}
         </TabPanel>
       </Box>
       <Dialog open={openEstados} onClose={handleCloseEstados}>
