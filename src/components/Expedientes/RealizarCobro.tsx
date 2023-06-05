@@ -10,6 +10,7 @@ import { price } from "@/utils/Format";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
 import { totales } from "./Totales";
+import { ExpedientesService } from "@/services/expedientes.service";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -31,10 +32,33 @@ export default function RealizarCobro({
 }) {
   const total = totales(expediente);
   const [open, setOpen] = React.useState(true);
+  const [openRecibo, setOpenRecibo] = React.useState(false);
   const [pagoCliente, setPagoCliente] = React.useState<number | null>(null);
   const handleClose = () => {
     setOpen(false);
     handleOpen();
+  };
+  const handleCobroSinRecibo = () => {
+    setOpen(false);
+    cobrar(suplidos, Number(pagoCliente || 0));
+    handleOpen();
+  };
+  const handleCobroConRecibo = () => {
+    setOpen(false);
+    cobrar(suplidos, Number(pagoCliente || 0));
+    new ExpedientesService()
+      .getRecibo({ suplidos, pagoCliente, expediente })
+      .then(async (response) => {
+        const res = await response.blob();
+        return res;
+      })
+      .then((blob) => {
+        const objectURL = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = objectURL;
+        a.target = "_blank";
+        a.click();
+      });
   };
   const [suplidos, setSuplidos] = React.useState(() => {
     return expediente.suplidos
@@ -70,8 +94,7 @@ export default function RealizarCobro({
     );
   };
   const handleCobrar = () => {
-    cobrar(suplidos, Number(pagoCliente || 0));
-    handleClose();
+    setOpenRecibo(true);
   };
   const handleSuplidoImporte = (id, value) => {
     setSuplidos(
@@ -278,6 +301,25 @@ export default function RealizarCobro({
           </div>
         </div>
       </div>
+      <Dialog
+        open={openRecibo}
+        onClose={() => {}}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Imprimir recibo</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            ¿Desea generar un recibo?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCobroSinRecibo}>Sin Recibo</Button>
+          <Button onClick={handleCobroConRecibo} autoFocus>
+            Con Recibo
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Dialog>
   );
 }

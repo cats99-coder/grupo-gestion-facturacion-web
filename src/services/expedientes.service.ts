@@ -26,4 +26,7 @@ export class ExpedientesService extends Service {
   async getColaboraciones(id: string) {
     return await this.post(`/expedientes/colaboraciones`, { usuario: id });
   }
+  async getRecibo(recibo: any) {
+    return await this.post(`/expedientes/imprimirRecibo`, recibo);
+  }
 }
