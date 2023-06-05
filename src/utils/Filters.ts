@@ -1,6 +1,8 @@
 export function gridFilter(a: any, model: any) {
   if (!Object.hasOwn(model, "items")) return true;
-  //console.log(a, model.items[0]);
+  if (!Object.hasOwn(model.items, "operator")) return true;
+  if (!Object.hasOwn(model.items, "field")) return true;
+  if (!Object.hasOwn(model.items, "value")) return true;
   const {
     operator,
     field,
