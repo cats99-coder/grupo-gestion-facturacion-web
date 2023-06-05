@@ -18,6 +18,7 @@ import { ClientesService } from "@/services/clientes.service";
 import { DatePicker } from "@mui/x-date-pickers";
 import { DateTime } from "luxon";
 import { ToastContext } from "@/components/Providers";
+import { gridFilter } from "@/utils/Filters";
 
 export default function Expedientes() {
   const [expedientes, setExpedientes] = useState<GridRowsProp>([]);
@@ -224,6 +225,7 @@ export default function Expedientes() {
     router.push(`/expedientes/nuevo/`);
   };
   const tipos = ["RUBEN", "INMA", "ANDREA", "CRISTINA"];
+  const [filterModel, setFilterModel] = useState({});
   const [tipo, setTipo] = useState<Tipos>([]);
   const [cliente, setCliente] = useState<Cliente[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
@@ -269,7 +271,10 @@ export default function Expedientes() {
         );
       })
       .filter(checkFrom)
-      .filter(checkUntil);
+      .filter(checkUntil)
+      .filter((a: any) => {
+        return gridFilter(a, filterModel);
+      });
     const totales: any = expedientesFiltrados.reduce(
       (prev, current) => {
         const e = {
@@ -316,7 +321,7 @@ export default function Expedientes() {
       totales.colaboradores -
       totales.cobrado;
     return { expedientesFiltrados, ...totales, pendiente };
-  }, [expedientes, tipo, cliente, fechaFin, fechaInicio]);
+  }, [expedientes, tipo, cliente, fechaFin, fechaInicio, filterModel]);
   return (
     <div className="grid grid-cols-1 grid-rows-[min-content_minmax(0,1fr)] gap-y-2 h-full">
       <div className="flex justify-between items-center">
@@ -368,6 +373,7 @@ export default function Expedientes() {
       <DataGrid
         className="w-full"
         getRowId={(row) => row._id}
+        onFilterModelChange={(model) => setFilterModel(model)}
         disableRowSelectionOnClick={true}
         onRowClick={handleRowClick}
         checkboxSelection
