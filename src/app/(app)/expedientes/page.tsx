@@ -63,12 +63,12 @@ export default function Expedientes() {
       field: "cliente",
       renderCell: (params) => params.row?.cliente?.nombreCompleto,
       headerName: "Cliente",
-      width: 250,
+      width: 350,
     },
     {
       field: "tipo",
       headerName: "Usuario",
-      width: 250,
+      width: 150,
     },
     {
       field: "fecha",

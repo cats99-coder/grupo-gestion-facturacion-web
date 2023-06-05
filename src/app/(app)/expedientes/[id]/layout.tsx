@@ -2,7 +2,7 @@
 import * as React from "react";
 import { useContext } from "react";
 import TextField from "@mui/material/TextField";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { ExpedientesService } from "@/services/expedientes.service";
 import { DatePicker } from "@mui/x-date-pickers";
 
@@ -30,6 +30,8 @@ import Cobros from "@/components/Expedientes/Cobros";
 import { DateToDoce } from "@/utils";
 import RealizarCobro from "@/components/Expedientes/RealizarCobro";
 import objectId from "@/utils/ObjectId";
+import { useNavigationEvent } from "@/utils/hooks/useNavigationEvent";
+import { useRouter } from "next/navigation";
 
 export default function ExpedienteLayout({
   children,
@@ -37,6 +39,7 @@ export default function ExpedienteLayout({
   children: React.ReactNode;
 }) {
   const { user } = useContext(AuthContext);
+  const [modificado, setModificado] = React.useState(false);
   const [clientes, setClientes] = React.useState<Cliente[]>([]);
   const [facturado, setFacturado] = React.useState<boolean>(false);
   const [expediente, setExpediente] = React.useState<Expediente>({
@@ -63,24 +66,28 @@ export default function ExpedienteLayout({
     DateTime.fromJSDate(new Date(Date.now()))
   );
   const handleSuplidos = (suplidos: Suplido[]) => {
+    setModificado(true);
     setExpediente({
       ...expediente,
       suplidos,
     });
   };
   const handleColaboradores = (colaboradores: Colaborador[]) => {
+    setModificado(true);
     setExpediente({
       ...expediente,
       colaboradores,
     });
   };
   const handleCobros = (cobros: Cobro[]) => {
+    setModificado(true);
     setExpediente({
       ...expediente,
       cobros,
     });
   };
   const cobrar = (suplidos: any, pago: number) => {
+    setModificado(true);
     setExpediente((value) => {
       const cobros: any = [];
       const fecha = new Date();
@@ -141,6 +148,25 @@ export default function ExpedienteLayout({
     setValue(0);
     setValue(2);
   };
+  useNavigationEvent(() => {
+    if (modificado) {
+      return "";
+    }
+  });
+  React.useEffect(() => {
+    const beforeUnloadEvent = (e) => {
+      if (modificado) {
+        alert("No se ha guardado");
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", beforeUnloadEvent);
+    return () => {
+      window.removeEventListener("beforeunload", beforeUnloadEvent);
+    };
+  }, [modificado]);
   const { id } = useParams();
   React.useEffect(() => {
     if (id !== "nuevo") {
@@ -162,6 +188,7 @@ export default function ExpedienteLayout({
     });
   }, []);
   const handleExpediente = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setModificado(true);
     setExpediente({ ...expediente, [e.target.name]: e.target.value });
   };
   const { setOpenSuccess, setMessageSuccess } =
@@ -188,6 +215,7 @@ export default function ExpedienteLayout({
           const res = await response.json();
           router.push(`/expedientes/${res?._id}`);
           setOpenSuccess(true);
+          setModificado(false);
           setMessageSuccess("Creado con éxito");
         });
     }
