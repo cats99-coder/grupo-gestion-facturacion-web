@@ -10,7 +10,13 @@ import {
 } from "@mui/x-data-grid";
 import { useEffect, useState, useContext, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Autocomplete, Button, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  Button,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+} from "@mui/material";
 import { ExpedientesService } from "@/services/expedientes.service";
 import { price } from "@/utils/Format";
 import { textSpanIntersectsWithPosition } from "typescript";
@@ -195,10 +201,19 @@ export default function Expedientes() {
         );
       },
       valueGetter(params) {
-        const total = params.row.cobros.reduce((suma: number, cobro: any) => {
+        let resto =
+          params.row.importe +
+          params.row.colaboradores.reduce((suma: number, colaborador: any) => {
+            return suma + Number(colaborador.importe);
+          }, 0);
+        resto = resto + resto * (params.row.IVA / 100);
+        resto += params.row.suplidos.reduce((suma: number, suplido: any) => {
+          return suma + Number(suplido.importe);
+        }, 0);
+        resto -= params.row.cobros.reduce((suma: number, cobro: any) => {
           return suma + Number(cobro.importe);
         }, 0);
-        return price(total);
+        return price(resto);
       },
       width: 150,
     },
@@ -239,6 +254,7 @@ export default function Expedientes() {
     return DateTime.fromJSDate(now);
   });
   const [fechaFin, setFechaFin] = useState<DateTime | null>(null);
+  const [pendientes, setPendientes] = useState("todos");
   const checkFrom = (value: GridValidRowModel) => {
     if (fechaInicio === null) return true;
     if (DateTime.fromISO(value.fecha).diff(fechaInicio).valueOf() <= 0)
@@ -250,6 +266,29 @@ export default function Expedientes() {
     if (DateTime.fromISO(value.fecha).diff(fechaFin).valueOf() > 0)
       return false;
     return true;
+  };
+  const pendientesFilter = (value: GridValidRowModel) => {
+    if (pendientes === "todos") return true;
+    let resto =
+      value.importe +
+      value.colaboradores.reduce((suma: number, colaborador: any) => {
+        return suma + Number(colaborador.importe);
+      }, 0);
+    resto = resto + resto * (value.IVA / 100);
+    resto += value.suplidos.reduce((suma: number, suplido: any) => {
+      return suma + Number(suplido.importe);
+    }, 0);
+    resto -= value.cobros.reduce((suma: number, cobro: any) => {
+      return suma + Number(cobro.importe);
+    }, 0);
+    console.log(resto);
+    console.log(pendientes);
+    if (resto !== 0) {
+      if (pendientes === "pendientes") return true;
+    } else {
+      if (pendientes === "pagados") return true;
+    }
+    return false;
   };
   const expedientesProcesados = useMemo(() => {
     const expedientesFiltrados = expedientes
@@ -274,7 +313,8 @@ export default function Expedientes() {
       .filter(checkUntil)
       .filter((a: any) => {
         return gridFilter(a, filterModel);
-      });
+      })
+      .filter(pendientesFilter);
     const totales: any = expedientesFiltrados.reduce(
       (prev, current) => {
         const e = {
@@ -321,7 +361,15 @@ export default function Expedientes() {
       totales.colaboradores -
       totales.cobrado;
     return { expedientesFiltrados, ...totales, pendiente };
-  }, [expedientes, tipo, cliente, fechaFin, fechaInicio, filterModel]);
+  }, [
+    expedientes,
+    tipo,
+    cliente,
+    fechaFin,
+    fechaInicio,
+    filterModel,
+    pendientes,
+  ]);
   return (
     <div className="grid grid-cols-1 grid-rows-[min-content_minmax(0,1fr)] gap-y-2 h-full">
       <div className="flex justify-between items-center">
@@ -365,6 +413,17 @@ export default function Expedientes() {
             format="dd/MM/yyyy"
             onChange={(value) => setFechaFin(value)}
           />
+          <ToggleButtonGroup
+            color="primary"
+            value={pendientes}
+            exclusive
+            onChange={(e, value) => setPendientes(value)}
+            aria-label="Platform"
+          >
+            <ToggleButton value="todos">Todos</ToggleButton>
+            <ToggleButton value="pagados">Pagados</ToggleButton>
+            <ToggleButton value="pendientes">Pendientes</ToggleButton>
+          </ToggleButtonGroup>
         </div>
         <div className="flex items-center">
           <Button onClick={handleNuevo}>Nuevo</Button>

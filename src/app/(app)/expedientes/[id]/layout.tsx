@@ -30,8 +30,8 @@ import Cobros from "@/components/Expedientes/Cobros";
 import { DateToDoce } from "@/utils";
 import RealizarCobro from "@/components/Expedientes/RealizarCobro";
 import objectId from "@/utils/ObjectId";
-import { useNavigationEvent } from "@/utils/hooks/useNavigationEvent";
 import { useRouter } from "next/navigation";
+import { useLeavePageConfirmation } from "@/utils/hooks/useLeavePageConfirmation";
 
 export default function ExpedienteLayout({
   children,
@@ -86,6 +86,7 @@ export default function ExpedienteLayout({
       cobros,
     });
   };
+  useLeavePageConfirmation(modificado);
   const cobrar = (suplidos: any, pago: number) => {
     setModificado(true);
     setExpediente((value) => {
@@ -148,25 +149,6 @@ export default function ExpedienteLayout({
     setValue(0);
     setValue(2);
   };
-  useNavigationEvent(() => {
-    if (modificado) {
-      return "";
-    }
-  });
-  React.useEffect(() => {
-    const beforeUnloadEvent = (e) => {
-      if (modificado) {
-        alert("No se ha guardado");
-        e.preventDefault();
-        e.returnValue = "";
-      }
-    };
-
-    window.addEventListener("beforeunload", beforeUnloadEvent);
-    return () => {
-      window.removeEventListener("beforeunload", beforeUnloadEvent);
-    };
-  }, [modificado]);
   const { id } = useParams();
   React.useEffect(() => {
     if (id !== "nuevo") {
