@@ -38,12 +38,12 @@ export default function RealizarCobro({
     setOpen(false);
     handleOpen();
   };
-  const handleCobroSinRecibo = () => {
+  const handleCobroSinRecibo = (): void => {
     setOpen(false);
     cobrar(suplidos, Number(pagoCliente || 0));
-    handleOpen();
+    handleClose();
   };
-  const handleCobroConRecibo = () => {
+  const handleCobroConRecibo = (): void => {
     setOpen(false);
     cobrar(suplidos, Number(pagoCliente || 0));
     new ExpedientesService()
@@ -59,6 +59,7 @@ export default function RealizarCobro({
         a.target = "_blank";
         a.click();
       });
+    handleClose();
   };
   const [suplidos, setSuplidos] = React.useState(() => {
     return expediente.suplidos
@@ -118,6 +119,7 @@ export default function RealizarCobro({
     const base =
       total.base + total.IVA - (total as any)?.cobrosPorTipo?.general;
     const pagar = base + suplidosSumaPagar;
+    console.log('realizar')
     const cambio = Number(pagoCliente || 0) - pagar;
     const pendiente = total.pendiente - Number(pagoCliente || 0);
     return {

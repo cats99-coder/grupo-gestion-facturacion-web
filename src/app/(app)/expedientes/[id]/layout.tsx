@@ -86,7 +86,6 @@ export default function ExpedienteLayout({
       cobros,
     });
   };
-  useLeavePageConfirmation(modificado);
   const cobrar = (suplidos: any, pago: number) => {
     setModificado(true);
     setExpediente((value) => {
@@ -146,8 +145,8 @@ export default function ExpedienteLayout({
       });
       return { ...value, cobros: [...value.cobros, ...cobros] };
     });
-    setValue(0);
-    setValue(2);
+    // setValue(0);
+    // setValue(2);
   };
   const { id } = useParams();
   React.useEffect(() => {
@@ -399,35 +398,6 @@ export default function ExpedienteLayout({
           )}
         </TabPanel>
       </Box>
-      <Dialog open={openEstados} onClose={handleCloseEstados}>
-        <DialogTitle>Estados del expediente</DialogTitle>
-        <DialogContent>
-          <DialogContentText>Estados del expediente</DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            size="small"
-            id="suplido-concepto"
-            label="Concepto"
-            fullWidth
-            variant="outlined"
-            onChange={(e) =>
-              setNewEstado({ ...newEstado, concepto: e.target.value })
-            }
-          />
-          <DatePicker label="Fecha" sx={{ width: "100%" }} slots={{}} />
-          <DataGrid
-            className=""
-            getRowId={(row) => row._id}
-            rows={expediente.estados}
-            columns={columns}
-            // onRowSelectionModelChange={handleSelection}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseEstados}>Cerrar</Button>
-        </DialogActions>
-      </Dialog>
     </section>
   );
 }
