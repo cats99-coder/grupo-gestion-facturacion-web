@@ -281,8 +281,6 @@ export default function Expedientes() {
     resto -= value.cobros.reduce((suma: number, cobro: any) => {
       return suma + Number(cobro.importe);
     }, 0);
-    console.log(resto);
-    console.log(pendientes);
     if (resto !== 0) {
       if (pendientes === "pendientes") return true;
     } else {
