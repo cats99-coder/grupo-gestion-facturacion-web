@@ -68,7 +68,7 @@ export default function BasicTabs() {
   const { id } = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const externo = searchParams.get("externo");
+  const externo = searchParams?.get("externo");
   React.useEffect(() => {
     if (id !== "nuevo") {
       if (externo === null) {
@@ -113,6 +113,7 @@ export default function BasicTabs() {
       const { _id, ...createClient } = cliente;
       new ClientesService().create(createClient).then(async (response) => {
         const res = await response.json();
+        console.log(res);
         router.push(`/clientes/${res?._id}`);
         setOpenSuccess(true);
         setMessageSuccess("Creado con éxito");
@@ -122,24 +123,56 @@ export default function BasicTabs() {
   const { user } = useContext<any>(AuthContext);
   const [colaboraciones, setColaboraciones] = useState([]);
   useEffect(() => {
-    if (externo === "false") {
-      new ExpedientesService().getColaboraciones(id).then(async (response) => {
-        setColaboraciones(await response.json());
-      });
-    }
+    new ExpedientesService().getColaboraciones(id).then(async (response) => {
+      setColaboraciones(await response.json());
+    });
   }, []);
-  console.log(colaboraciones);
   const columns: GridColDef[] = [
-    { field: "expediente", headerName: "Número de Expediente", width: 300 },
+    {
+      field: "numero_expediente",
+      headerName: "Número de Expediente",
+      width: 200,
+      valueGetter: (params) => {
+        return params.row.expediente.numero_expediente;
+      },
+    },
+    {
+      field: "cliente",
+      headerName: "Cliente",
+      width: 300,
+      valueGetter: (params) => {
+        return params.row.expediente.cliente?.nombreCompleto;
+      },
+    },
+    {
+      field: "concepto",
+      headerName: "Concepto",
+      width: 300,
+      valueGetter: (params) => {
+        return params.row.expediente.concepto;
+      },
+    },
     {
       field: "importe",
       headerName: "Importe",
-      width: 300,
-      valueGetter: (params)=> {
+      width: 150,
+      valueGetter: (params) => {
         return price(params.row.importe);
       },
     },
+    {
+      field: "pendiente",
+      headerName: "Pendiente",
+      width: 150,
+      valueGetter: (params) => {
+        const pagos = params.row.pagos.reduce((suma: number, pago: any) => {
+          return suma + Number(pago.importe || 0);
+        }, 0);
+        return price(params.row.importe - pagos);
+      },
+    },
   ];
+  console.log(colaboraciones);
   return (
     <section className="h-full grid grid-rows-[min-content_min-content_minmax(0,1fr)] gap-y-2">
       <div className="flex justify-end items-center">
@@ -177,7 +210,7 @@ export default function BasicTabs() {
               <TabPanel key={colaboracion.tipo} value={tab} index={index}>
                 <DataGrid
                   className="w-full"
-                  getRowId={(row) => `${row.expediente}`}
+                  getRowId={(row) => `${row.expediente.numero_expediente}`}
                   disableRowSelectionOnClick={true}
                   checkboxSelection
                   rows={colaboracion.deudas}

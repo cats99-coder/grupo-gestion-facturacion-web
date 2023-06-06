@@ -145,8 +145,6 @@ export default function ExpedienteLayout({
       });
       return { ...value, cobros: [...value.cobros, ...cobros] };
     });
-    // setValue(0);
-    // setValue(2);
   };
   const { id } = useParams();
   React.useEffect(() => {
