@@ -187,6 +187,7 @@ export default function ExpedienteLayout({
           if (!response.ok) return false;
           setOpenSuccess(true);
           setMessageSuccess("Actualizado con exito");
+          setModificado(false);
         });
     } else {
       const { _id, numero_expediente, factura, ...createExpediente } =
