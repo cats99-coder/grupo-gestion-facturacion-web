@@ -44,14 +44,14 @@ export default function Clientes() {
   return (
     <div className="grid grid-cols-1 grid-rows-[min-content_minmax(0,1fr)] gap-y-2 h-full">
       <div className="flex justify-between items-center">
-        <div className="flex items-center">
+        <div className="flex items-center gap-2">
           <h1 className="">Clientes</h1>
           <Autocomplete
             multiple={true}
             options={clientes}
             className="col-span-3"
             size="small"
-            sx={{ width: 300 }}
+            sx={{ width: 400 }}
             value={clientesSelecionados}
             isOptionEqualToValue={(option, value) => {
               return option._id === value._id;

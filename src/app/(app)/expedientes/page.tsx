@@ -85,7 +85,7 @@ export default function Expedientes() {
       headerName: "Fecha",
       width: 150,
     },
-    { field: "concepto", headerName: "Concepto", width: 250 },
+    { field: "concepto", headerName: "Concepto", width: 400 },
     {
       field: "importe",
       headerName: "Importe",
