@@ -5,7 +5,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Button } from "@mui/material";
+import { Button, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { ClientesService } from "@/services/clientes.service";
 import { AuthContext, ToastContext } from "@/components/Providers";
 import { useContext } from "react";
@@ -13,7 +13,7 @@ import { UsuariosService } from "@/services/usuarios.service";
 import { ColaboradoresService } from "@/services/colaboradores.service";
 import { ExpedientesService } from "@/services/expedientes.service";
 import { price } from "@/utils/Format";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridValidRowModel } from "@mui/x-data-grid";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -69,6 +69,7 @@ export default function BasicTabs() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const externo = searchParams?.get("externo");
+  const [pendientes, setPendientes] = useState("todos");
   React.useEffect(() => {
     if (id !== "nuevo") {
       if (externo === null) {
@@ -127,29 +128,52 @@ export default function BasicTabs() {
       setColaboraciones(await response.json());
     });
   }, []);
-  const totales = useMemo(() => {
-    const total = colaboraciones.reduce((prev: any, current: any, index) => {
-      const importe = current.deudas.reduce((suma: number, deuda: any) => {
-        return suma + Number(deuda.importe || 0);
+  const pendientesFilter = (value: GridValidRowModel) => {
+    if (pendientes === "todos") return true;
+    console.log(value);
+    const pendiente =
+      value.importe -
+      value.pagos.reduce((suma, pago) => {
+        return suma + Number(pago.importe || 0);
       }, 0);
-      const pendiente =
-        importe -
-        current.deudas.reduce((sumTotal, deuda) => {
-          return (
-            sumTotal +
-            deuda.pagos.reduce((suma: number, pago: any) => {
-              return suma + Number(pago.importe || 0);
-            }, 0)
-          );
+    if (pendiente !== 0) {
+      if (pendientes === "pendientes") return true;
+    } else {
+      if (pendientes === "pagados") return true;
+    }
+    return false;
+  };
+  const totales = useMemo(() => {
+    const colaboracionesFiltradas = colaboraciones.map((colaboracion) => {
+      const deudas = colaboracion.deudas.filter(pendientesFilter);
+      return { ...colaboracion, deudas };
+    });
+    const total = colaboracionesFiltradas.reduce(
+      (prev: any, current: any, index) => {
+        const importe = current.deudas.reduce((suma: number, deuda: any) => {
+          return suma + Number(deuda.importe || 0);
         }, 0);
-      prev[index] = {
-        importe,
-        pendiente,
-      };
-      return prev;
-    }, []);
-    return total;
-  }, [colaboraciones]);
+        const pendiente =
+          importe -
+          current.deudas.reduce((sumTotal: any, deuda: any) => {
+            return (
+              sumTotal +
+              deuda.pagos.reduce((suma: number, pago: any) => {
+                return suma + Number(pago.importe || 0);
+              }, 0)
+            );
+          }, 0);
+        prev[index] = {
+          importe,
+          pendiente,
+        };
+        return prev;
+      },
+      []
+    );
+    return { ...total, colaboracionesFiltradas };
+  }, [colaboraciones, pendientes]);
+  console.log(totales.colaboracionesFiltradas);
   const columns: GridColDef[] = [
     {
       field: "numero_expediente",
@@ -211,7 +235,6 @@ export default function BasicTabs() {
       },
     },
   ];
-  console.log(colaboraciones);
   return (
     <section className="h-full grid grid-rows-[min-content_min-content_minmax(0,1fr)] gap-y-2">
       <div className="flex justify-end items-center">
@@ -222,6 +245,17 @@ export default function BasicTabs() {
       {/* FORMULARIO -------------------------------------------- */}
       <div className="grid grid-cols-6 gap-3 grid-rows-1">
         <div>{cliente.nombre}</div>
+        <ToggleButtonGroup
+          color="primary"
+          value={pendientes}
+          exclusive
+          onChange={(e, value) => setPendientes(value)}
+          aria-label="Platform"
+        >
+          <ToggleButton value="todos">Todos</ToggleButton>
+          <ToggleButton value="pagados">Pagados</ToggleButton>
+          <ToggleButton value="pendientes">Pendientes</ToggleButton>
+        </ToggleButtonGroup>
       </div>
       {/* TAB -------------------------------------------- */}
       {id !== "nuevo" && (
@@ -244,7 +278,7 @@ export default function BasicTabs() {
               })}
             </Tabs>
           </Box>
-          {colaboraciones.map((colaboracion: any, index) => {
+          {totales.colaboracionesFiltradas.map((colaboracion: any, index) => {
             return (
               <TabPanel key={colaboracion.tipo} value={tab} index={index}>
                 <DataGrid
