@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
@@ -127,6 +127,29 @@ export default function BasicTabs() {
       setColaboraciones(await response.json());
     });
   }, []);
+  const totales = useMemo(() => {
+    const total = colaboraciones.reduce((prev: any, current: any, index) => {
+      const importe = current.deudas.reduce((suma: number, deuda: any) => {
+        return suma + Number(deuda.importe || 0);
+      }, 0);
+      const pendiente =
+        importe -
+        current.deudas.reduce((sumTotal, deuda) => {
+          return (
+            sumTotal +
+            deuda.pagos.reduce((suma: number, pago: any) => {
+              return suma + Number(pago.importe || 0);
+            }, 0)
+          );
+        }, 0);
+      prev[index] = {
+        importe,
+        pendiente,
+      };
+      return prev;
+    }, []);
+    return total;
+  }, [colaboraciones]);
   const columns: GridColDef[] = [
     {
       field: "numero_expediente",
@@ -156,6 +179,14 @@ export default function BasicTabs() {
       field: "importe",
       headerName: "Importe",
       width: 150,
+      renderHeader: (params) => {
+        return (
+          <div className="flex flex-col leading-4">
+            <span>{price(totales[tab].importe)}</span>
+            <span>Importe</span>
+          </div>
+        );
+      },
       valueGetter: (params) => {
         return price(params.row.importe);
       },
@@ -164,6 +195,14 @@ export default function BasicTabs() {
       field: "pendiente",
       headerName: "Pendiente",
       width: 150,
+      renderHeader: (params) => {
+        return (
+          <div className="flex flex-col leading-4">
+            <span>{price(totales[tab].pendiente)}</span>
+            <span>Pendiente</span>
+          </div>
+        );
+      },
       valueGetter: (params) => {
         const pagos = params.row.pagos.reduce((suma: number, pago: any) => {
           return suma + Number(pago.importe || 0);
