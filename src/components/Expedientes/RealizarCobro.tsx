@@ -119,7 +119,6 @@ export default function RealizarCobro({
     const base =
       total.base + total.IVA - (total as any)?.cobrosPorTipo?.general;
     const pagar = base + suplidosSumaPagar;
-    console.log('realizar')
     const cambio = Number(pagoCliente || 0) - pagar;
     const pendiente = total.pendiente - Number(pagoCliente || 0);
     return {
@@ -129,7 +128,7 @@ export default function RealizarCobro({
       cambio,
       pendiente,
     };
-  }, [pagoCliente, suplidos, expediente]);
+  }, [pagoCliente, suplidos]);
   return (
     <Dialog
       fullScreen

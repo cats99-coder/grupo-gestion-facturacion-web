@@ -31,7 +31,6 @@ import { DateToDoce } from "@/utils";
 import RealizarCobro from "@/components/Expedientes/RealizarCobro";
 import objectId from "@/utils/ObjectId";
 import { useRouter } from "next/navigation";
-import { useLeavePageConfirmation } from "@/utils/hooks/useLeavePageConfirmation";
 
 export default function ExpedienteLayout({
   children,
@@ -85,6 +84,8 @@ export default function ExpedienteLayout({
       ...expediente,
       cobros,
     });
+    setValue(1);
+    setValue(2);
   };
   const cobrar = (suplidos: any, pago: number) => {
     setModificado(true);
@@ -387,13 +388,11 @@ export default function ExpedienteLayout({
           />
         </TabPanel>
         <TabPanel value={value} index={2}>
-          {value === 2 && (
-            <Cobros
-              initialRows={expediente.cobros}
-              suplidos={expediente.suplidos}
-              handleCobros={handleCobros}
-            />
-          )}
+          <Cobros
+            initialRows={expediente.cobros}
+            suplidos={expediente.suplidos}
+            handleCobros={handleCobros}
+          />
         </TabPanel>
       </Box>
     </section>
