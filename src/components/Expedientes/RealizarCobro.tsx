@@ -35,6 +35,8 @@ export default function RealizarCobro({
   const [openRecibo, setOpenRecibo] = React.useState(false);
   const [pagoCliente, setPagoCliente] = React.useState<number | null>(null);
   const handleClose = () => {
+    console.log('101')
+
     setOpen(false);
     handleOpen();
   };
@@ -62,6 +64,8 @@ export default function RealizarCobro({
     handleClose();
   };
   const [suplidos, setSuplidos] = React.useState(() => {
+    console.log('101')
+
     return expediente.suplidos
       .map((suplido) => {
         return JSON.parse(JSON.stringify(suplido));
@@ -85,6 +89,7 @@ export default function RealizarCobro({
       });
   });
   const handleCheck = (id, checked) => {
+    console.log('101')  
     setSuplidos(
       suplidos.map((suplido) => {
         if (suplido._id === id) {
@@ -95,9 +100,12 @@ export default function RealizarCobro({
     );
   };
   const handleCobrar = () => {
+    console.log('101')
+
     setOpenRecibo(true);
   };
   const handleSuplidoImporte = (id, value) => {
+    console.log('101')
     setSuplidos(
       suplidos.map((suplido) => {
         if (suplido._id === id) {
@@ -119,6 +127,7 @@ export default function RealizarCobro({
     const base =
       total.base + total.IVA - (total as any)?.cobrosPorTipo?.general;
     const pagar = base + suplidosSumaPagar;
+    console.log('realizar')
     const cambio = Number(pagoCliente || 0) - pagar;
     const pendiente = total.pendiente - Number(pagoCliente || 0);
     return {
@@ -129,6 +138,7 @@ export default function RealizarCobro({
       pendiente,
     };
   }, [pagoCliente, suplidos]);
+  console.log('hola')
   return (
     <Dialog
       fullScreen

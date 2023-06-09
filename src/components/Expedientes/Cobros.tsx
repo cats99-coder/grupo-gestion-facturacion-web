@@ -58,7 +58,7 @@ function EditToolbar(props: EditToolbarProps) {
   );
 }
 
-export default function Cobros({ initialRows, handleCobros, suplidos }: any) {
+export default function Cobros({ initialRows, handleCobros, suplidos, pas }: any) {
   const [rows, setRows] = React.useState(
     initialRows.map((i: any) => {
       if (i.suplidoRef) {
@@ -82,7 +82,7 @@ export default function Cobros({ initialRows, handleCobros, suplidos }: any) {
   }, []);
   React.useEffect(() => {
     setRows(initialRows);
-  }, [initialRows]);
+  }, [pas]);
   React.useEffect(() => {
     handleCobros(rows);
   }, [rows]);

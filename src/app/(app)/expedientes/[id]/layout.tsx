@@ -89,6 +89,7 @@ export default function ExpedienteLayout({
   };
   const cobrar = (suplidos: any, pago: number) => {
     setModificado(true);
+    setPas(!pas)
     setExpediente((value) => {
       const cobros: any = [];
       const fecha = new Date();
@@ -148,6 +149,7 @@ export default function ExpedienteLayout({
     });
   };
   const { id } = useParams();
+  const [pas, setPas] = React.useState(true);
   React.useEffect(() => {
     if (id !== "nuevo") {
       new ExpedientesService().getById(id).then(async (response) => {
@@ -184,6 +186,7 @@ export default function ExpedienteLayout({
         .then((response) => {
           if (!response.ok) return false;
           setOpenSuccess(true);
+          setPas(!pas)
           setMessageSuccess("Actualizado con exito");
           setModificado(false);
         });
@@ -211,6 +214,7 @@ export default function ExpedienteLayout({
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+  console.log("padre");
   const [openNew, setOpenNew] = React.useState(false);
   const [openRealizarPago, setOpenReliazarPago] = React.useState(false);
   const [openEstados, setOpenEstados] = React.useState(false);
@@ -392,6 +396,7 @@ export default function ExpedienteLayout({
             initialRows={expediente.cobros}
             suplidos={expediente.suplidos}
             handleCobros={handleCobros}
+            pas={pas}
           />
         </TabPanel>
       </Box>
