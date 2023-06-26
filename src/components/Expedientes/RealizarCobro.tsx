@@ -35,8 +35,6 @@ export default function RealizarCobro({
   const [openRecibo, setOpenRecibo] = React.useState(false);
   const [pagoCliente, setPagoCliente] = React.useState<number | null>(null);
   const handleClose = () => {
-    console.log('101')
-
     setOpen(false);
     handleOpen();
   };

@@ -19,9 +19,10 @@ import { ExpedientesService } from "@/services/expedientes.service";
 import { FacturasService } from "@/services/facturas.service";
 import { AuthContext, ToastContext } from "@/components/Providers";
 import { price } from "@/utils/Format";
+import NuevaFactura from "@/components/Facturas/NuevaFactura";
 
 export default function Facturar() {
-  const [expedientes, setExpedientes] = useState<GridRowsProp>([]);
+  const [expedientes, setExpedientes] = useState<Expediente[]>([]);
   const [seleccionados, setSeleccionados] = useState<GridRowSelectionModel>([]);
   const [serie, setSerie] = useState<number>(23);
   const {
@@ -107,36 +108,40 @@ export default function Facturar() {
       width: 150,
     },
   ];
-  const handleRowClick: GridEventListener<"rowClick"> = (params) => {
-    router.push(`/expedientes/${params.id}/`);
-  };
-  const facturar = () => {
-    new FacturasService()
-      .create({ expedientes: seleccionados, serie, tipoParaFacturar })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error("Error al facturar");
-        }
-        new ExpedientesService().porFacturar().then(async (response) => {
-          setOpenSuccess(true);
-          setMessageSuccess("Facturado con exito!");
-          setExpedientes(await response.json());
-        });
-      })
-      .catch((err) => {
-        setOpenWarning(true);
-        setMessageWarning("Imposible facturar");
-      });
-  };
   const { user }: { user: any } = useContext(AuthContext);
   const tipos = ["RUBEN", "INMA", "ANDREA", "CRISTINA"];
   const [tipo, setTipo] = useState<Tipos>([]);
   const [tipoParaFacturar, setTipoParaFacturar] = useState<Tipo>(user.rol);
+  const [facturacion, setFacturacion] = useState<boolean>(false);
+  const verFacturacion = () => {
+    setFacturacion(true);
+  };
+  const facturacionClose = () => {
+    setFacturacion(false);
+    new ExpedientesService().porFacturar().then(async (response) => {
+      setExpedientes(await response.json());
+    });
+  };
   return (
     <div className="grid grid-cols-1 grid-rows-[min-content_minmax(0,1fr)] gap-y-2 h-full">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <h1 className="">Expedientes pendientes de facturar</h1>
+          {facturacion && (
+            <NuevaFactura
+              handleClose={facturacionClose}
+              persona={tipoParaFacturar}
+              serie={serie}
+              expedientes={expedientes.filter((expediente) => {
+                return (
+                  -1 !==
+                  seleccionados.findIndex((seleccionado) => {
+                    return seleccionado === expediente._id;
+                  })
+                );
+              })}
+            />
+          )}
           <Autocomplete
             multiple={true}
             options={tipos}
@@ -173,7 +178,7 @@ export default function Facturar() {
               <TextField {...params} label="Facturar a nombre de" />
             )}
           />
-          <Button onClick={facturar}>Facturar</Button>
+          <Button onClick={verFacturacion}>Facturar</Button>
         </div>
       </div>
       <DataGrid

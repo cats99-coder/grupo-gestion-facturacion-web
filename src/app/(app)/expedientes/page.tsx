@@ -190,6 +190,36 @@ export default function Expedientes() {
       width: 150,
     },
     {
+      field: "total",
+      headerName: "Total",
+      renderHeader: (params: GridColumnHeaderParams) => {
+        return (
+          <div className="flex flex-col leading-4">
+            <span>{price((expedientesProcesados as any).total)}</span>
+            <span>Total</span>
+          </div>
+        );
+      },
+      valueGetter(params) {
+        const colaboradores = params.row.colaboradores.reduce(
+          (suma: number, suplido: any) => {
+            return suma + Number(suplido.importe);
+          },
+          0
+        );
+        const suplidos = params.row.suplidos.reduce(
+          (suma: number, suplido: any) => {
+            return suma + Number(suplido.importe);
+          },
+          0
+        );
+        const total =
+          params.row.importe + params.row.IVA + suplidos + colaboradores;
+        return price(total);
+      },
+      width: 150,
+    },
+    {
       field: "pendiente",
       headerName: "Pendiente",
       renderHeader: (params: GridColumnHeaderParams) => {
@@ -352,13 +382,10 @@ export default function Expedientes() {
         pendiente: 0,
       }
     );
-    const pendiente: number =
-      totales.importe +
-      totales.IVA +
-      totales.suplidos +
-      totales.colaboradores -
-      totales.cobrado;
-    return { expedientesFiltrados, ...totales, pendiente };
+    const total: number =
+      totales.importe + totales.IVA + totales.suplidos + totales.colaboradores;
+    const pendiente: number = total - totales.cobrado;
+    return { expedientesFiltrados, ...totales, pendiente, total };
   }, [
     expedientes,
     tipo,
@@ -387,6 +414,8 @@ export default function Expedientes() {
             multiple={true}
             options={clientes}
             className="col-span-3"
+            disableCloseOnSelect
+            limitTags={2}
             size="small"
             sx={{ width: 300 }}
             value={cliente}
