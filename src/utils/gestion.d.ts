@@ -50,6 +50,8 @@ interface Expediente {
   usuario: Usuario | null;
   concepto: string;
   importe: number;
+  perdidas: number
+  facturaNoCliente: boolean;
   colaboradores: Colaborador[];
   provisiones: number;
   cobros: Cobro[];

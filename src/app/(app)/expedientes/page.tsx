@@ -274,15 +274,7 @@ export default function Expedientes() {
   const [tipo, setTipo] = useState<Tipos>([]);
   const [cliente, setCliente] = useState<Cliente[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [fechaInicio, setFechaInicio] = useState<DateTime | null>(() => {
-    const now = new Date();
-    now.setDate(1);
-    now.setMonth(0);
-    now.setMilliseconds(0);
-    now.setHours(0);
-    now.setSeconds(0);
-    return DateTime.fromJSDate(now);
-  });
+  const [fechaInicio, setFechaInicio] = useState<DateTime | null>(null);
   const [fechaFin, setFechaFin] = useState<DateTime | null>(null);
   const [pendientes, setPendientes] = useState("todos");
   const checkFrom = (value: GridValidRowModel) => {

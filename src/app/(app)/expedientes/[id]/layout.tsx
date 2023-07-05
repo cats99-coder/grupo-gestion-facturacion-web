@@ -15,6 +15,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  FormControlLabel,
+  Checkbox,
   Tab,
   Tabs,
 } from "@mui/material";
@@ -49,6 +51,8 @@ export default function ExpedienteLayout({
     usuario: null,
     concepto: "",
     importe: 0,
+    facturaNoCliente: false,
+    perdidas: 0,
     provisiones: 0,
     suplidos: [],
     colaboradores: [],
@@ -89,7 +93,7 @@ export default function ExpedienteLayout({
   };
   const cobrar = (suplidos: any, pago: number) => {
     setModificado(true);
-    setPas(!pas)
+    setPas(!pas);
     setExpediente((value) => {
       const cobros: any = [];
       const fecha = new Date();
@@ -171,7 +175,11 @@ export default function ExpedienteLayout({
   }, []);
   const handleExpediente = (e: React.ChangeEvent<HTMLInputElement>) => {
     setModificado(true);
-    setExpediente({ ...expediente, [e.target.name]: e.target.value });
+    if (e.target.name === "facturaNoCliente") {
+      setExpediente({ ...expediente, [e.target.name]: e.target.checked });
+    } else {
+      setExpediente({ ...expediente, [e.target.name]: e.target.value });
+    }
   };
   const { setOpenSuccess, setMessageSuccess } =
     React.useContext<any>(ToastContext);
@@ -186,7 +194,7 @@ export default function ExpedienteLayout({
         .then((response) => {
           if (!response.ok) return false;
           setOpenSuccess(true);
-          setPas(!pas)
+          setPas(!pas);
           setMessageSuccess("Actualizado con exito");
           setModificado(false);
         });
@@ -271,7 +279,7 @@ export default function ExpedienteLayout({
       {/* FORMULARIO -------------------------------------------- */}
       <div className="grid grid-cols-6 gap-3 h-min">
         <TextField
-          className="col-span-2"
+          className="col-span-1"
           disabled={true}
           size="small"
           onChange={handleExpediente}
@@ -296,7 +304,7 @@ export default function ExpedienteLayout({
         />
         <Autocomplete
           options={clientes}
-          className="col-span-3"
+          className="col-span-2"
           size="small"
           value={expediente.cliente}
           onChange={handleExpedienteCliente}
@@ -308,7 +316,7 @@ export default function ExpedienteLayout({
           renderInput={(params) => <TextField {...params} label="cliente" />}
         />
         <TextField
-          className="col-span-3"
+          className="col-span-2"
           size="small"
           onChange={handleExpediente}
           name="concepto"
@@ -357,6 +365,31 @@ export default function ExpedienteLayout({
           label="Provisiones"
           variant="outlined"
           autoComplete="off"
+        />
+        <TextField
+          className="col-span-1"
+          type={"number"}
+          size="small"
+          onChange={handleExpediente}
+          name="perdidas"
+          disabled={facturado}
+          value={expediente.perdidas}
+          id="perdidas"
+          label="Perdidas"
+          variant="outlined"
+          autoComplete="off"
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              disabled={facturado}
+              checked={expediente.facturaNoCliente}
+              name="facturaNoCliente"
+              onChange={handleExpediente}
+              inputProps={{ "aria-label": "controlled" }}
+            />
+          }
+          label="Factura No Cliente"
         />
       </div>
       <Box

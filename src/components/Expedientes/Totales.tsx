@@ -93,7 +93,7 @@ export const totales = (expediente: Expediente) => {
       }, 0);
     const restoIVA =
       (base - cobrosPorTipo?.general) * (Number(expediente.IVA) / 100);
-    const total = base + IVA + Number(suplidos);
+    const total = base + IVA + Number(suplidos)-Number(expediente.perdidas);
     const pendiente = total - cobros - expediente.provisiones;
     return {
       base,
