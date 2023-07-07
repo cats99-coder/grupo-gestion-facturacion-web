@@ -220,7 +220,6 @@ export default function Expedientes() {
       },
       width: 150,
     },
-
     {
       field: "pendiente",
       headerName: "Pendiente",
@@ -425,24 +424,21 @@ export default function Expedientes() {
             onChange={(e, value) => setCliente(value)}
             renderInput={(params) => <TextField {...params} label="Clientes" />}
           />
-          <div className="grid place-content-center gap-2 grid-cols-2">
-            <Button onClick={handleInicioDeYear} className="">
-              Inicio de año
-            </Button>
-            <div></div>
-            <DatePicker
-              label="Fecha Inicio"
-              value={fechaInicio}
-              format="dd/MM/yyyy"
-              onChange={(value) => setFechaInicio(value)}
-            />
-            <DatePicker
-              label="Fecha Fin"
-              value={fechaFin}
-              format="dd/MM/yyyy"
-              onChange={(value) => setFechaFin(value)}
-            />
-          </div>
+          <Button onClick={handleInicioDeYear} className="">
+            Inicio de año
+          </Button>
+          <DatePicker
+            label="Fecha Inicio"
+            value={fechaInicio}
+            format="dd/MM/yyyy"
+            onChange={(value) => setFechaInicio(value)}
+          />
+          <DatePicker
+            label="Fecha Fin"
+            value={fechaFin}
+            format="dd/MM/yyyy"
+            onChange={(value) => setFechaFin(value)}
+          />
           <ToggleButtonGroup
             color="primary"
             value={pendientes}
