@@ -171,25 +171,6 @@ export default function Expedientes() {
       width: 150,
     },
     {
-      field: "cobros",
-      headerName: "Cobrado",
-      renderHeader: (params: GridColumnHeaderParams) => {
-        return (
-          <div className="flex flex-col leading-4">
-            <span>{price((expedientesProcesados as any).cobrado)}</span>
-            <span>Cobrado</span>
-          </div>
-        );
-      },
-      valueGetter(params) {
-        const total = params.row.cobros.reduce((suma: number, cobro: any) => {
-          return suma + Number(cobro.importe);
-        }, 0);
-        return price(total);
-      },
-      width: 150,
-    },
-    {
       field: "total",
       headerName: "Total",
       renderHeader: (params: GridColumnHeaderParams) => {
@@ -214,11 +195,32 @@ export default function Expedientes() {
           0
         );
         const total =
-          params.row.importe + params.row.IVA + suplidos + colaboradores;
+          (params.row.importe + colaboradores) * (1 + params.row.IVA / 100) +
+          suplidos;
         return price(total);
       },
       width: 150,
     },
+    {
+      field: "cobros",
+      headerName: "Cobrado",
+      renderHeader: (params: GridColumnHeaderParams) => {
+        return (
+          <div className="flex flex-col leading-4">
+            <span>{price((expedientesProcesados as any).cobrado)}</span>
+            <span>Cobrado</span>
+          </div>
+        );
+      },
+      valueGetter(params) {
+        const total = params.row.cobros.reduce((suma: number, cobro: any) => {
+          return suma + Number(cobro.importe);
+        }, 0);
+        return price(total);
+      },
+      width: 150,
+    },
+
     {
       field: "pendiente",
       headerName: "Pendiente",
@@ -268,6 +270,9 @@ export default function Expedientes() {
   };
   const handleNuevo = () => {
     router.push(`/expedientes/nuevo/`);
+  };
+  const handleInicioDeYear = () => {
+    setFechaInicio(DateTime.fromISO("2023-01-01T00:00:00.000"));
   };
   const tipos = ["RUBEN", "INMA", "ANDREA", "CRISTINA"];
   const [filterModel, setFilterModel] = useState({});
@@ -409,7 +414,7 @@ export default function Expedientes() {
             disableCloseOnSelect
             limitTags={2}
             size="small"
-            sx={{ width: 300 }}
+            sx={{ width: 700 }}
             value={cliente}
             isOptionEqualToValue={(option, value) => {
               return option._id === value._id;
@@ -420,18 +425,24 @@ export default function Expedientes() {
             onChange={(e, value) => setCliente(value)}
             renderInput={(params) => <TextField {...params} label="Clientes" />}
           />
-          <DatePicker
-            label="Fecha Inicio"
-            value={fechaInicio}
-            format="dd/MM/yyyy"
-            onChange={(value) => setFechaInicio(value)}
-          />
-          <DatePicker
-            label="Fecha Fin"
-            value={fechaFin}
-            format="dd/MM/yyyy"
-            onChange={(value) => setFechaFin(value)}
-          />
+          <div className="grid place-content-center gap-2 grid-cols-2">
+            <Button onClick={handleInicioDeYear} className="">
+              Inicio de año
+            </Button>
+            <div></div>
+            <DatePicker
+              label="Fecha Inicio"
+              value={fechaInicio}
+              format="dd/MM/yyyy"
+              onChange={(value) => setFechaInicio(value)}
+            />
+            <DatePicker
+              label="Fecha Fin"
+              value={fechaFin}
+              format="dd/MM/yyyy"
+              onChange={(value) => setFechaFin(value)}
+            />
+          </div>
           <ToggleButtonGroup
             color="primary"
             value={pendientes}
