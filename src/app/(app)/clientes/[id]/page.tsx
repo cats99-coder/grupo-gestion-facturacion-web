@@ -351,22 +351,22 @@ export default function BasicTabs() {
               aria-label="basic tabs example"
             >
               <Tab label="Expedientes" {...a11yProps(0)} />
-              <Tab label="Contactos" {...a11yProps(1)} />
-              <Tab label="Facturas" {...a11yProps(2)} />
-              <Tab label="Estadísticas" {...a11yProps(3)} />
+              <Tab label="Facturas" {...a11yProps(1)} />
+              <Tab label="Contactos" {...a11yProps(2)} />
+              {/* <Tab label="Estadísticas" {...a11yProps(3)} /> */}
             </Tabs>
           </Box>
           <TabPanel value={tab} index={0}>
             <Expedientes _id={cliente._id} />
           </TabPanel>
           <TabPanel value={tab} index={1}>
+            <Facturas _id={cliente._id} />
+          </TabPanel>
+          <TabPanel value={tab} index={2}>
             <Contactos
               initialRows={cliente.contactos}
               handleContactos={handleContactos}
             />
-          </TabPanel>
-          <TabPanel value={tab} index={2}>
-            <Facturas _id={cliente._id} />
           </TabPanel>
         </Box>
       )}
