@@ -85,6 +85,7 @@ export default function Expedientes() {
       headerName: "Fecha",
       width: 150,
     },
+    { field: "tipoGestion", headerName: "Tipo Gestión", width: 150 },
     { field: "concepto", headerName: "Concepto", width: 400 },
     {
       field: "importe",
