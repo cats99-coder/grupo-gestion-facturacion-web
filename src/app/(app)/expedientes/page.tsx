@@ -64,7 +64,7 @@ export default function Expedientes() {
   };
 
   const columns: GridColDef[] = [
-    { field: "numero_expediente", headerName: "Número Expediente", width: 150 },
+    { field: "numero_expediente", headerName: "Nº Expte", width: 150 },
     {
       field: "cliente",
       renderCell: (params) => params.row?.cliente?.nombreCompleto,
