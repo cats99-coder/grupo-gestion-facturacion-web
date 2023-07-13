@@ -50,7 +50,7 @@ interface Expediente {
   usuario: Usuario | null;
   concepto: string;
   importe: number;
-  perdidas: number
+  perdidas: number;
   facturaNoCliente: boolean;
   colaboradores: Colaborador[];
   provisiones: number;
@@ -59,6 +59,16 @@ interface Expediente {
   factura: Factura;
   suplidos: Suplido[];
   estados: Estado[];
+  tipoGestion:
+    | "ASOCIACIONES"
+    | "EXTRANJERIA"
+    | "FISCAL"
+    | "LABORAL"
+    | "LEGAL"
+    | "REGISTRO CIVIL"
+    | "TRAFICO"
+    | "VARIOS"
+    | null;
 }
 interface Suplido {
   _id?: string;

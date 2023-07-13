@@ -64,6 +64,7 @@ export default function ExpedienteLayout({
       serie: 0,
     },
     estados: [],
+    tipoGestion: null,
   });
   const [fecha, setFecha] = React.useState<DateTime | null>(
     DateTime.fromJSDate(new Date(Date.now()))
@@ -181,6 +182,9 @@ export default function ExpedienteLayout({
       setExpediente({ ...expediente, [e.target.name]: e.target.value });
     }
   };
+  const handleExpedienteTipo = (value: any) => {
+    setExpediente({ ...expediente, tipoGestion: value });
+  };
   const { setOpenSuccess, setMessageSuccess } =
     React.useContext<any>(ToastContext);
   const handleExpedienteCliente = (e: any, value: Cliente) => {
@@ -222,7 +226,6 @@ export default function ExpedienteLayout({
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
-  console.log("padre");
   const [openNew, setOpenNew] = React.useState(false);
   const [openRealizarPago, setOpenReliazarPago] = React.useState(false);
   const [openEstados, setOpenEstados] = React.useState(false);
@@ -326,6 +329,25 @@ export default function ExpedienteLayout({
           label="Concepto"
           variant="outlined"
           autoComplete="off"
+        />
+        <Autocomplete
+          options={[
+            "ASOCIACIONES",
+            "EXTRANJERIA",
+            "FISCAL",
+            "LABORAL",
+            "LEGAL",
+            "REGISTRO CIVIL",
+            "TRAFICO",
+            "VARIOS",
+          ]}
+          className="col-span-1"
+          size="small"
+          value={expediente.tipoGestion}
+          onChange={(e, value) => handleExpedienteTipo(value)}
+          renderInput={(params) => (
+            <TextField {...params} name="tipoGestion" label="Tipo Gestión" />
+          )}
         />
         <TextField
           className="col-span-1"
